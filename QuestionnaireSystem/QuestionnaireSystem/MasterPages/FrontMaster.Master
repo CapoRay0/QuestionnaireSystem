@@ -1,0 +1,33 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="FrontMaster.master.cs" Inherits="QuestionnaireSystem.MasterPages.FrontMaster" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+
+    <link href="../ExternalTools/css/bootstrap.css" rel="stylesheet" />
+    <script src="../ExternalTools/js/bootstrap.js"></script>
+    <script src="../ExternalTools/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+    <form id="form1" runat="server">
+
+        <div class="col-md-3">
+        </div>
+
+        <div align="center" class="container col-md-6">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+
+        <div class="col-md-3">
+        </div>
+
+    </form>
+</body>
+</html>
