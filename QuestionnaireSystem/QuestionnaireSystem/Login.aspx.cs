@@ -38,7 +38,7 @@ namespace QuestionnaireSystem
 
             if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
             {
-                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確，請確認內容及大小寫')</script>");
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
                 return;
             }
 

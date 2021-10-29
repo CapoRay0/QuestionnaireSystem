@@ -100,6 +100,8 @@ namespace QuestionnaireSystem.GeneralUserPages
 
             this.gvGList.DataSource = dt;
             this.gvGList.DataBind();
+
+            UcPager.Visible = false;
         }
 
         protected void gvGList_RowDataBound(object sender, GridViewRowEventArgs e)
