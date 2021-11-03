@@ -170,6 +170,33 @@ namespace DBSource
             }
         }
 
+        public static bool CloseQuesStateByTime(int QuesID)
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string dbCommand =
+                $@" UPDATE [Questionnaire]
+                    SET
+                        [State] = 0
+                    WHERE [QuesID] = @quesID";
+
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@quesID", QuesID));
+
+            try
+            {
+                int effectRows = DBHelper.ModifyData(connStr, dbCommand, paramList);
+
+                if (effectRows == 1)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return false;
+            }
+        }
 
         #region 新增與修改問卷
         public static void CreateQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime EndDate, DateTime CreateDate,int State,int Count)

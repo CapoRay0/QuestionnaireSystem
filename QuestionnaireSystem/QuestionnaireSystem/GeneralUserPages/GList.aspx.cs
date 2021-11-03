@@ -29,6 +29,7 @@ namespace QuestionnaireSystem.GeneralUserPages
                 this.UcPager.TotalSize = dt.Rows.Count;
                 this.UcPager.Bind();
             }
+
         }
 
         protected void btnSearch_Click(object sender, EventArgs e) //待優化
@@ -36,62 +37,50 @@ namespace QuestionnaireSystem.GeneralUserPages
             var search = this.txtTitle.Text.Trim();
             dt = QuestionnaireData.SearchQuestionnaire(search);
 
-            if (this.txtDateStart.Text != "" && this.txtDateEnd.Text != "") //開始結束都有填
+            for (int i = 0; i < dt.Rows.Count; i++)
             {
-                DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
-                DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
-                for (int i = 0; i < dt.Rows.Count; i++)
+                if (this.txtDateStart.Text != "" && this.txtDateEnd.Text != "") //開始結束都有填
                 {
-                    if (dt.Rows[i][5].ToString() != "")
+                    DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
+                    DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
+                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+
+                    if ((searchEnd - searchStart).Days < 0)
+                        Response.Write("<Script language='JavaScript'>alert('日期不可為負的'); location.href='SList.aspx'; </Script>");
+                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
                     {
-                        DateTime dbStart = Convert.ToDateTime(dt.Rows[i][4]);
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i][5]);
-                        if ((searchEnd - dbEnd).Days > 0 || (searchStart - dbStart).Days < 0)
+                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                        if ((dbEnd - searchStart).Days < 0 || (dbStart - searchEnd).Days > 0)
                             dt.Rows[i].Delete();
                     }
-                    else
-                    {
-                        DateTime dbStart = Convert.ToDateTime(dt.Rows[i][4]);
-                        if ((searchStart - dbStart).Days < 0)
-                            dt.Rows[i].Delete();
-                    }
+                    if ((dbStart - searchEnd).Days > 0)
+                        dt.Rows[i].Delete();
                 }
-            }
-            else if (this.txtDateStart.Text != "" && this.txtDateEnd.Text == "") //只填開始時間
-            {
-                DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
-                for (int i = 0; i < dt.Rows.Count; i++)
+                else if (this.txtDateStart.Text != "" && this.txtDateEnd.Text == "") //只填開始時間
                 {
-                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i][4]);
-                    if (dt.Rows[i][5].ToString() != "") //若DB有結束時間
+                    DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
+                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
                     {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i][5]);
+                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
                         if ((dbEnd - searchStart).Days < 0)
                             dt.Rows[i].Delete();
                     }
-                    if ((dbStart - searchStart).Days < 0)
-                        dt.Rows[i].Delete();
                 }
-            }
-            else if (this.txtDateStart.Text == "" && this.txtDateEnd.Text != "") //只填結束時間
-            {
-                DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
-                for (int i = 0; i < dt.Rows.Count; i++)
+                else if (this.txtDateStart.Text == "" && this.txtDateEnd.Text != "") //只填結束時間
                 {
-                    if (dt.Rows[i][5].ToString() != "") //若DB有結束時間
+                    DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
+                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
                     {
-                        DateTime dbStart = Convert.ToDateTime(dt.Rows[i][4]);
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i][5]);
-                        if ((searchEnd - dbEnd).Days > 0 || (searchEnd - dbStart).Days <= 0)
+                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                        if ((dbEnd - searchEnd).Days < 0 || (dbStart - searchEnd).Days > 0)
                             dt.Rows[i].Delete();
                     }
                     else //若DB無結束時間
                     {
-                        DateTime dbStart = Convert.ToDateTime(dt.Rows[i][4]);
-                        if ((searchEnd - dbStart).Days < 0)
+                        if ((dbStart - searchEnd).Days > 0)
                             dt.Rows[i].Delete();
                     }
-
                 }
             }
 
