@@ -38,15 +38,25 @@
             <asp:BoundField DataField="QuesID" HeaderText="#" />
             <asp:HyperLinkField DataNavigateUrlFields="QuesGuid" DataNavigateUrlFormatString="Detail.aspx?ID={0}" DataTextField="Caption" HeaderText="問卷" />
             <asp:TemplateField HeaderText="狀態">
-                    <ItemTemplate>
-                        <asp:Label ID="lblState" runat="server"></asp:Label>
-                    </ItemTemplate>
+                <ItemTemplate>
+                    <asp:Label ID="lblState" runat="server"></asp:Label>
+                </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField DataField="StartDate" HeaderText="開始時間" DataFormatString="{0:d}" />
-            <asp:BoundField DataField="EndDate" HeaderText="結束時間" DataFormatString="{0:d}" />
+
+            <asp:TemplateField HeaderText="開始時間">
+                <ItemTemplate>
+                    <asp:Label ID="lblStartDate" runat="server"></asp:Label>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="結束時間">
+                <ItemTemplate>
+                    <asp:Label ID="lblEndDate" runat="server"></asp:Label>
+                </ItemTemplate>
+            </asp:TemplateField>
+
             <asp:TemplateField HeaderText="觀看統計">
                 <ItemTemplate>
-                    <a href="SStastic.aspx?ID=<%# Eval("QuesID") %>">前往</a>
+                    <a href="SStastic.aspx?ID=<%# Eval("QuesGuid") %>">前往</a>
                 </ItemTemplate>
             </asp:TemplateField>
         </Columns>

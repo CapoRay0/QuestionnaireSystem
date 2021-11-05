@@ -10,6 +10,11 @@ namespace DBSource
 {
     public class UserInfoManager
     {
+        /// <summary>
+        /// 透過帳號來取得使用者資訊
+        /// </summary>
+        /// <param name="account"></param>
+        /// <returns></returns>
         public static DataRow GetUserInfoByAccount(string account)
         {
             string connectionString = DBHelper.GetConnectionString();
@@ -38,6 +43,13 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 透過手機與Email來更改密碼
+        /// </summary>
+        /// <param name="Phone"></param>
+        /// <param name="Email"></param>
+        /// <param name="Newpwd"></param>
+        /// <returns></returns>
         public static bool ChangePwd(string Phone, string Email, string Newpwd)
         {
             string connStr = DBHelper.GetConnectionString();
@@ -67,6 +79,12 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 確認手機與Email是否正確
+        /// </summary>
+        /// <param name="Phone"></param>
+        /// <param name="Email"></param>
+        /// <returns></returns>
         public static bool CheckInfoIsCorrectForForgotPWD(string Phone, string Email)
         {
             string connStr = DBHelper.GetConnectionString();

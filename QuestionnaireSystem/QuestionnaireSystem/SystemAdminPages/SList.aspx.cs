@@ -26,7 +26,7 @@ namespace QuestionnaireSystem.SystemAdminPages
 
             dt = QuestionnaireData.GetQuestionnaire();
 
-            // 取得現在時間判斷是否關閉問卷
+            // 取得現在時間來判斷是否關閉問卷
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 if (dt.Rows[i]["EndDate"].ToString() != "")
@@ -52,77 +52,63 @@ namespace QuestionnaireSystem.SystemAdminPages
                 this.UcPager.TotalSize = dt.Rows.Count;
                 this.UcPager.Bind();
             }
-
-            btnDelete.Attributes.Add("onclick ", "return confirm( '確定要將選取問卷刪除嗎?');");
-
+            btnDelete.Attributes.Add("onclick ", "return confirm( '確定要將選取問卷刪除嗎?');"); // 刪除確認
         }
 
-        #region search
-        protected void btnSearch_Click(object sender, EventArgs e) // 待優化 >> 資料庫的 NULL 問題
+        /// <summary>
+        /// 搜尋按鈕
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnSearch_Click(object sender, EventArgs e)
         {
             var search = this.txtTitle.Text.Trim();
             dt = QuestionnaireData.SearchQuestionnaire(search);
 
-
-
             for (int i = 0; i < dt.Rows.Count; i++)
             {
+                DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+                DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+
                 if (this.txtDateStart.Text != "" && this.txtDateEnd.Text != "") //開始結束都有填
                 {
                     DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
                     DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
-                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
-
                     if ((searchEnd - searchStart).Days < 0)
                         Response.Write("<Script language='JavaScript'>alert('日期不可為負的'); location.href='SList.aspx'; </Script>");
-                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
-                    {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
-                        if ((dbEnd - searchStart).Days < 0 || (dbStart - searchEnd).Days > 0)
-                            dt.Rows[i].Delete();
-                    }
-                    if ((dbStart - searchEnd).Days > 0)
+                    if ((dbEnd - searchStart).Days < 0 || (dbStart - searchEnd).Days > 0)
                         dt.Rows[i].Delete();
                 }
                 else if (this.txtDateStart.Text != "" && this.txtDateEnd.Text == "") //只填開始時間
                 {
                     DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
-                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
-                    {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
-                        if ((dbEnd - searchStart).Days < 0)
-                            dt.Rows[i].Delete();
-                    }
+                    if ((dbEnd - searchStart).Days < 0)
+                        dt.Rows[i].Delete();
                 }
                 else if (this.txtDateStart.Text == "" && this.txtDateEnd.Text != "") //只填結束時間
                 {
                     DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
-                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
-                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
-                    {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
-                        if ((dbEnd - searchEnd).Days < 0 || (dbStart - searchEnd).Days > 0)
-                            dt.Rows[i].Delete();
-                    }
-                    else //若DB無結束時間
-                    {
-                        if ((dbStart - searchEnd).Days > 0)
-                            dt.Rows[i].Delete();
-                    }
+                    if ((dbStart - searchEnd).Days > 0)
+                        dt.Rows[i].Delete();
                 }
             }
 
-
             if (dt.Rows.Count == 0)
                 this.ltlMsg.Text = "<br /><br /><br />查無資料";
+            else
+                this.ltlMsg.Text = "";
 
             this.gvSList.DataSource = dt;
             this.gvSList.DataBind();
 
             UcPager.Visible = false;
         }
-        #endregion
 
+        /// <summary>
+        /// 刪除問卷
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnDelete_Click(object sender, ImageClickEventArgs e)
         {
 
@@ -140,32 +126,57 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         }
 
+        /// <summary>
+        /// 新增問卷
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnNewForm_Click(object sender, ImageClickEventArgs e)
         {
             Response.Redirect("Detail.aspx");
         }
 
+        /// <summary>
+        /// GridView 內容呈現
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void gvSlist_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             var row = e.Row;
             if (row.RowType == DataControlRowType.DataRow)
             {
-                Label lbl = row.FindControl("lblState") as Label;
+                Label lblState = row.FindControl("lblState") as Label;
+                Label lblStartDate = row.FindControl("lblStartDate") as Label;
+                Label lblEndDate = row.FindControl("lblEndDate") as Label;
+
                 var dr = row.DataItem as DataRowView;
                 int QuesState = dr.Row.Field<int>("State");
                 switch (QuesState)
                 {
                     case 0:
-                        lbl.Text = "已關閉";
+                        lblState.Text = "已關閉";
                         break;
                     case 1:
-                        lbl.Text = "開放中";
+                        lblState.Text = "開放";
                         break;
                 }
+
+                DateTime QuesStartDate = dr.Row.Field<DateTime>("StartDate");
+                if (QuesStartDate.ToString("yyyy-MM-dd") == "1800-01-01")
+                    lblStartDate.Text = "-";
+                else
+                    lblStartDate.Text = QuesStartDate.ToString("yyyy-MM-dd");
+
+                DateTime QuesEndDate = dr.Row.Field<DateTime>("EndDate");
+                if (QuesEndDate.ToString("yyyy-MM-dd") == "3000-12-31")
+                    lblEndDate.Text = "-";
+                else
+                    lblEndDate.Text = QuesEndDate.ToString("yyyy-MM-dd");
             }
         }
 
-
+        #region UcPager 換頁
         private int GetCurrentPage()
         {
             string pageText = Request.QueryString["Page"];
@@ -186,7 +197,6 @@ namespace QuestionnaireSystem.SystemAdminPages
         {
             DataTable dtPaged = dt.Clone();
 
-            int pageSize = this.UcPager.PageSize;
             int startIndex = (this.GetCurrentPage() - 1) * 10;
             int endIndex = (this.GetCurrentPage()) * 10;
 
@@ -206,19 +216,7 @@ namespace QuestionnaireSystem.SystemAdminPages
             }
             return dtPaged;
         }
+        #endregion
 
-
-
-
-        ///// <summary>
-        ///// GridView 內建換頁
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //protected void gvSList_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        //{
-        //    gvSList.PageIndex = e.NewPageIndex;
-        //    this.gvSList.DataBind();
-        //}
     }
 }

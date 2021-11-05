@@ -46,7 +46,6 @@ namespace DBSource
             }
         }
 
-
         /// <summary>
         /// 取得問卷資料表
         /// </summary>
@@ -170,6 +169,11 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 因結束時間已到而關閉問卷
+        /// </summary>
+        /// <param name="QuesID"></param>
+        /// <returns></returns>
         public static bool CloseQuesStateByTime(int QuesID)
         {
             string connStr = DBHelper.GetConnectionString();
@@ -199,7 +203,17 @@ namespace DBSource
         }
 
         #region 新增與修改問卷
-        public static void CreateQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime EndDate, DateTime CreateDate,int State,int Count)
+        /// <summary>
+        /// 新增問卷
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <param name="Caption"></param>
+        /// <param name="Description"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <param name="State"></param>
+        /// <param name="Count"></param>
+        public static void CreateQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime EndDate ,int State, int Count)
         {
             string connStr = DBHelper.GetConnectionString();
             string dbCommand =
@@ -210,7 +224,6 @@ namespace DBSource
                        ,Description
                        ,StartDate
                        ,EndDate
-                       ,CreateDate
                        ,State
                        ,Count
                     )
@@ -221,7 +234,6 @@ namespace DBSource
                        ,@description
                        ,@startDate
                        ,@endDate
-                       ,@createDate
                        ,@state
                        ,@count
                     )
@@ -232,7 +244,6 @@ namespace DBSource
             paramList.Add(new SqlParameter("@description", Description));
             paramList.Add(new SqlParameter("@startDate", StartDate));
             paramList.Add(new SqlParameter("@endDate", EndDate));
-            paramList.Add(new SqlParameter("@createDate", CreateDate));
             paramList.Add(new SqlParameter("@state", State));
             paramList.Add(new SqlParameter("@count", Count));
 
@@ -245,85 +256,16 @@ namespace DBSource
                 logger.WriteLog(ex);
             }
         }
-        public static void CreateQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime CreateDate, int State, int Count)
-        {
-            string connStr = DBHelper.GetConnectionString();
-            string dbCommand =
-                $@" INSERT INTO [Questionnaire]
-                    (
-                        QuesGuid
-                       ,Caption
-                       ,Description
-                       ,StartDate
-                       ,CreateDate
-                       ,State
-                       ,Count
-                    )
-                    VALUES
-                    (
-                        @quesGuid
-                       ,@caption
-                       ,@description
-                       ,@startDate
-                       ,@createDate
-                       ,@state
-                       ,@count
-                    )
-                ";
-            List<SqlParameter> paramList = new List<SqlParameter>();
-            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
-            paramList.Add(new SqlParameter("@caption", Caption));
-            paramList.Add(new SqlParameter("@description", Description));
-            paramList.Add(new SqlParameter("@startDate", StartDate));
-            paramList.Add(new SqlParameter("@createDate", CreateDate));
-            paramList.Add(new SqlParameter("@state", State));
-            paramList.Add(new SqlParameter("@count", Count));
-
-            try
-            {
-                DBHelper.CreatData(connStr, dbCommand, paramList);
-            }
-            catch (Exception ex)
-            {
-                logger.WriteLog(ex);
-            }
-        }
-
-        public static bool EditQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, int State)
-        {
-            string connStr = DBHelper.GetConnectionString();
-            string dbCommand =
-                $@" UPDATE [Questionnaire]
-                    SET
-                        [Caption]     = @caption
-                       ,[Description] = @description
-                       ,[StartDate]   = @startDate
-                       ,[State]       = @state
-                    WHERE
-                        [QuesGuid] = @quesGuid ";
-
-            List<SqlParameter> paramList = new List<SqlParameter>();
-            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
-            paramList.Add(new SqlParameter("@caption", Caption));
-            paramList.Add(new SqlParameter("@description", Description));
-            paramList.Add(new SqlParameter("@startDate", StartDate));
-            paramList.Add(new SqlParameter("@state", State));
-
-            try
-            {
-                int effectRows = DBHelper.ModifyData(connStr, dbCommand, paramList);
-
-                if (effectRows == 1)
-                    return true;
-                else
-                    return false;
-            }
-            catch (Exception ex)
-            {
-                logger.WriteLog(ex);
-                return false;
-            }
-        }
+        /// <summary>
+        /// 修改問卷
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <param name="Caption"></param>
+        /// <param name="Description"></param>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <param name="State"></param>
+        /// <returns></returns>
         public static bool EditQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime EndDate, int State)
         {
             string connStr = DBHelper.GetConnectionString();

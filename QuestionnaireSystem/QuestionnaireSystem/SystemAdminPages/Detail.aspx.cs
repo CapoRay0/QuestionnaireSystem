@@ -37,7 +37,8 @@ namespace QuestionnaireSystem.SystemAdminPages
                     {
                         DateTime startDate = DateTime.Parse(dr["StartDate"].ToString());
                         string StartString = startDate.ToString("yyyy-MM-dd");
-                        this.txtStartDate.Text = StartString;
+                        if (StartString != "1800-01-01")
+                            this.txtStartDate.Text = StartString;
                     }
                     else
                         this.txtStartDate.Text = "";
@@ -46,7 +47,8 @@ namespace QuestionnaireSystem.SystemAdminPages
                     {
                         DateTime endDate = DateTime.Parse(dr["EndDate"].ToString());
                         string EndString = endDate.ToString("yyyy-MM-dd");
-                        this.txtEndDate.Text = EndString;
+                        if (EndString != "3000-12-31")
+                            this.txtEndDate.Text = EndString;
                     }
                     else
                         this.txtEndDate.Text = "";
@@ -90,43 +92,44 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         protected void btnSend_Click(object sender, EventArgs e)
         {
+            // 開始或結束時間若沒有填則預設為 1800/01/01 及 3000/12/31
+
             string id = this.Request.QueryString["ID"];
 
             #region 新增及修改問卷
             if (string.IsNullOrWhiteSpace(id)) //新增問卷
             {
+                Guid inpQuesGuid = Guid.NewGuid();
+                string inpCaption = this.txtCaption.Text;
+                string inpDescription = this.txtDescription.Text;
+
+                DateTime inpStartDate;
+                if (this.txtStartDate.Text != "")
+                    inpStartDate = Convert.ToDateTime(this.txtStartDate.Text);
+                else
+                    inpStartDate = new DateTime(1800, 1, 1);
+
+                DateTime inpEndDate;
+                if (this.txtEndDate.Text != "")
+                    inpEndDate = Convert.ToDateTime(this.txtEndDate.Text);
+                else
+                    inpEndDate = new DateTime(3000, 12, 31);
+
+                int inpState;
+                if (chkStatic.Checked == true)
+                    inpState = 1;
+                else
+                    inpState = 0;
+
+                int inpCount = 0;
                 if (this.txtCaption.Text != "")
                 {
-                    Guid inpQuesGuid = Guid.NewGuid();
-                    string inpCaption = this.txtCaption.Text;
-                    string inpDescription = this.txtDescription.Text;
-                    DateTime inpStartDate = Convert.ToDateTime(this.txtStartDate.Text);
-                    DateTime inpCreateDate = DateTime.Now;
-
-                    int inpState;
-                    if (chkStatic.Checked == true)
-                        inpState = 1;
-                    else
-                        inpState = 0;
-
-                    int inpCount = 0;
-
-                    if (this.txtEndDate.Text == "") //若結束時間為空
-                    {
-                        QuestionnaireData.CreateQuestionnaire(inpQuesGuid, inpCaption, inpDescription, inpStartDate, inpCreateDate, inpState, inpCount);
-                    }
+                    if ((inpEndDate - inpStartDate).Days > 0)
+                        QuestionnaireData.CreateQuestionnaire(inpQuesGuid, inpCaption, inpDescription, inpStartDate, inpEndDate, inpState, inpCount);
                     else
                     {
-                        DateTime inpEndDate = Convert.ToDateTime(this.txtEndDate.Text);
-
-                        if ((inpEndDate - inpStartDate).Days > 0)
-                            QuestionnaireData.CreateQuestionnaire(inpQuesGuid, inpCaption, inpDescription, inpStartDate, inpEndDate, inpCreateDate, inpState, inpCount);
-                        else
-                        {
-                            this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('日期不可為負的')</script>");
-                            return;
-                        }
-
+                        this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('日期不可為負的')</script>");
+                        return;
                     }
                     Response.Write("<Script language='JavaScript'>alert('問卷新增成功!!'); location.href='SList.aspx'; </Script>");
                 }
@@ -138,7 +141,18 @@ namespace QuestionnaireSystem.SystemAdminPages
                 Guid idToGuid = Guid.Parse(id);
                 string editCaption = this.txtCaption.Text;
                 string editDescription = this.txtDescription.Text;
-                DateTime editStartDate = Convert.ToDateTime(this.txtStartDate.Text);
+
+                DateTime editStartDate;
+                if (this.txtStartDate.Text != "")
+                    editStartDate = Convert.ToDateTime(this.txtStartDate.Text);
+                else
+                    editStartDate = new DateTime(1800, 1, 1);
+
+                DateTime editEndDate;
+                if (this.txtEndDate.Text != "")
+                    editEndDate = Convert.ToDateTime(this.txtEndDate.Text);
+                else
+                    editEndDate = new DateTime(3000, 12, 31);
 
                 int editState;
                 if (chkStatic.Checked == true)
@@ -148,21 +162,12 @@ namespace QuestionnaireSystem.SystemAdminPages
 
                 if (this.txtCaption.Text != "")
                 {
-                    if (this.txtEndDate.Text == "") //若結束時間為空
-                    {
-                        QuestionnaireData.EditQuestionnaire(idToGuid, editCaption, editDescription, editStartDate, editState);
-                    }
+                    if ((editEndDate - editStartDate).Days > 0)
+                        QuestionnaireData.EditQuestionnaire(idToGuid, editCaption, editDescription, editStartDate, editEndDate, editState);
                     else
                     {
-                        DateTime editEndDate = Convert.ToDateTime(this.txtEndDate.Text);
-
-                        if ((editEndDate - editStartDate).Days > 0)
-                            QuestionnaireData.EditQuestionnaire(idToGuid, editCaption, editDescription, editStartDate, editEndDate, editState);
-                        else
-                        {
-                            this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('日期不可為負的')</script>");
-                            return;
-                        }
+                        this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('日期不可為負的')</script>");
+                        return;
                     }
                     Response.Write("<Script language='JavaScript'>alert('問卷修改成功!!'); location.href='SList.aspx'; </Script>");
                 }

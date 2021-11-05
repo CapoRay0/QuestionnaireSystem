@@ -19,7 +19,7 @@ namespace QuestionnaireSystem.GeneralUserPages
             var dtPaged = this.GetPagedDataTable(dt);
 
             if (dt.Rows.Count == 0)
-                this.ltlMsg.Text = "查無資料";
+                this.ltlMsg.Text = "<br /><br /><br />查無資料";
 
             this.gvGList.DataSource = dtPaged;
 
@@ -29,63 +29,50 @@ namespace QuestionnaireSystem.GeneralUserPages
                 this.UcPager.TotalSize = dt.Rows.Count;
                 this.UcPager.Bind();
             }
-
         }
 
-        protected void btnSearch_Click(object sender, EventArgs e) //待優化
+        /// <summary>
+        /// 搜尋按鈕
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnSearch_Click(object sender, EventArgs e)
         {
             var search = this.txtTitle.Text.Trim();
             dt = QuestionnaireData.SearchQuestionnaire(search);
 
             for (int i = 0; i < dt.Rows.Count; i++)
             {
+                DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+                DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+
                 if (this.txtDateStart.Text != "" && this.txtDateEnd.Text != "") //開始結束都有填
                 {
                     DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
                     DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
-                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
-
                     if ((searchEnd - searchStart).Days < 0)
-                        Response.Write("<Script language='JavaScript'>alert('日期不可為負的'); location.href='SList.aspx'; </Script>");
-                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
-                    {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
-                        if ((dbEnd - searchStart).Days < 0 || (dbStart - searchEnd).Days > 0)
-                            dt.Rows[i].Delete();
-                    }
-                    if ((dbStart - searchEnd).Days > 0)
+                        Response.Write("<Script language='JavaScript'>alert('日期不可為負的'); location.href='GList.aspx'; </Script>");
+                    if ((dbEnd - searchStart).Days < 0 || (dbStart - searchEnd).Days > 0)
                         dt.Rows[i].Delete();
                 }
                 else if (this.txtDateStart.Text != "" && this.txtDateEnd.Text == "") //只填開始時間
                 {
                     DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
-                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
-                    {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
-                        if ((dbEnd - searchStart).Days < 0)
-                            dt.Rows[i].Delete();
-                    }
+                    if ((dbEnd - searchStart).Days < 0)
+                        dt.Rows[i].Delete();
                 }
                 else if (this.txtDateStart.Text == "" && this.txtDateEnd.Text != "") //只填結束時間
                 {
                     DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
-                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
-                    if (dt.Rows[i]["EndDate"].ToString() != "") //若DB有結束時間
-                    {
-                        DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
-                        if ((dbEnd - searchEnd).Days < 0 || (dbStart - searchEnd).Days > 0)
-                            dt.Rows[i].Delete();
-                    }
-                    else //若DB無結束時間
-                    {
-                        if ((dbStart - searchEnd).Days > 0)
-                            dt.Rows[i].Delete();
-                    }
+                    if ((dbStart - searchEnd).Days > 0)
+                        dt.Rows[i].Delete();
                 }
             }
 
             if (dt.Rows.Count == 0)
                 this.ltlMsg.Text = "<br /><br /><br />查無資料";
+            else
+                this.ltlMsg.Text = "";
 
             this.gvGList.DataSource = dt;
             this.gvGList.DataBind();
@@ -93,6 +80,11 @@ namespace QuestionnaireSystem.GeneralUserPages
             UcPager.Visible = false;
         }
 
+        /// <summary>
+        /// GridView 內容呈現
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void gvGList_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             var row = e.Row;
@@ -100,27 +92,41 @@ namespace QuestionnaireSystem.GeneralUserPages
             {
                 Label lblState = row.FindControl("lblState") as Label;
                 Label lblCaption = row.FindControl("lblCaption") as Label;
-                
+                Label lblStartDate = row.FindControl("lblStartDate") as Label;
+                Label lblEndDate = row.FindControl("lblEndDate") as Label;
+
                 var dr = row.DataItem as DataRowView;
+                int QuesState = dr.Row.Field<int>("State");
+                string QuesCaption = dr.Row.Field<string>("Caption");
+                Guid QuesGuid = dr.Row.Field<Guid>("QuesGuid");
 
-                int quesState = dr.Row.Field<int>("State");
-                string quesCaption = dr.Row.Field<string>("Caption");
-                Guid quesGuid = dr.Row.Field<Guid>("QuesGuid");
-
-                switch (quesState)
+                switch (QuesState)
                 {
                     case 0:
-                        lblState.Text = "已關閉";
-                        lblCaption.Text = quesCaption;
+                        lblState.Text = "已完結";
+                        lblCaption.Text = QuesCaption;
                         break;
                     case 1:
-                        lblState.Text = "開放中";
-                        lblCaption.Text = $"<a href='Form.aspx?ID={quesGuid}' target='_blank'>{quesCaption}</a>";
+                        lblState.Text = "投票中";
+                        lblCaption.Text = $"<a href='Form.aspx?ID={QuesGuid}' target='_blank'>{QuesCaption}</a>";
                         break;
                 }
+
+                DateTime QuesStartDate = dr.Row.Field<DateTime>("StartDate");
+                if (QuesStartDate.ToString("yyyy-MM-dd") == "1800-01-01")
+                    lblStartDate.Text = "-";
+                else
+                    lblStartDate.Text = QuesStartDate.ToString("yyyy-MM-dd");
+
+                DateTime QuesEndDate = dr.Row.Field<DateTime>("EndDate");
+                if (QuesEndDate.ToString("yyyy-MM-dd") == "3000-12-31")
+                    lblEndDate.Text = "-";
+                else
+                    lblEndDate.Text = QuesEndDate.ToString("yyyy-MM-dd");
             }
         }
 
+        #region UcPager 換頁
         private int GetCurrentPage()
         {
             string pageText = Request.QueryString["Page"];
@@ -141,7 +147,6 @@ namespace QuestionnaireSystem.GeneralUserPages
         {
             DataTable dtPaged = dt.Clone();
 
-            int pageSize = this.UcPager.PageSize;
             int startIndex = (this.GetCurrentPage() - 1) * 10;
             int endIndex = (this.GetCurrentPage()) * 10;
 
@@ -161,17 +166,7 @@ namespace QuestionnaireSystem.GeneralUserPages
             }
             return dtPaged;
         }
+        #endregion
 
-
-        ///// <summary>
-        ///// GridView 內建換頁
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //protected void gvGList_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        //{
-        //    gvGList.PageIndex = e.NewPageIndex;
-        //    this.gvGList.DataBind();
-        //}
     }
 }
