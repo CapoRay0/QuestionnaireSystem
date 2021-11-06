@@ -108,7 +108,7 @@ namespace QuestionnaireSystem.GeneralUserPages
                         break;
                     case 1:
                         lblState.Text = "投票中";
-                        lblCaption.Text = $"<a href='Form.aspx?ID={QuesGuid}' target='_blank'>{QuesCaption}</a>";
+                        lblCaption.Text = $"<a href='Form.aspx?ID={QuesGuid}'>{QuesCaption}</a>";
                         break;
                 }
 

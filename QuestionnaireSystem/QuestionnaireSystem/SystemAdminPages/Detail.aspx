@@ -20,6 +20,8 @@
             <li><a href="#tabs4">統計</a></li>
         </ul>
 
+
+
         <div id="tabs1">
             <table cellpadding="5">
                 <tr>
@@ -47,20 +49,24 @@
                 </tr>
                 <tr>
                     <td colspan="2" align="right">
-                        <asp:Button ID="btnCancel" runat="server" Text="取消" OnClick="btnCancel_Click" />
-                        <asp:Button ID="btnSend" runat="server" Text="送出" OnClick="btnSend_Click" />
+                        <asp:Button ID="btnCancel" CssClass="btn btn-outline-dark" runat="server" Text="取消" OnClick="btnCancel_Click" />
+                        <asp:Button ID="btnSend" CssClass="btn btn-outline-success" runat="server" Text="送出" OnClick="btnSend_Click" />
                     </td>
                 </tr>
             </table>
         </div>
 
+
+
         <div id="tabs2">
             <asp:Label ID="ltlSelectionType" runat="server" Text="種類"></asp:Label> &nbsp
             <asp:DropDownList ID="ddlCommon" runat="server" style="width:150px"></asp:DropDownList>
+
             <br /><br />
 
             <asp:Label ID="lblText" runat="server" Text="問題"></asp:Label> &nbsp
-            <asp:TextBox ID="txtText" runat="server" style="width:200px"></asp:TextBox> &nbsp
+            <asp:TextBox ID="txtQuestion" runat="server" style="width:200px"></asp:TextBox> &nbsp
+
             <asp:DropDownList ID="ddlSelectionType" runat="server" style="width:100px">
                 <asp:ListItem Value="0">單選方塊</asp:ListItem>
                 <asp:ListItem Value="1">複選方塊</asp:ListItem>
@@ -69,59 +75,71 @@
                 <asp:ListItem Value="4">文字(Email)</asp:ListItem>
                 <asp:ListItem Value="5">文字(日期)</asp:ListItem>
             </asp:DropDownList> &nbsp
+
             <asp:CheckBox ID="ckbIsMust" runat="server" />
             <asp:Label ID="lblIsMust" runat="server" Text="必填"></asp:Label>
-            <br /><br />
-            <asp:Label ID="lblSelection" runat="server" Text="回答"></asp:Label> &nbsp
-            <asp:TextBox ID="txtSelection" runat="server" style="width:200px"></asp:TextBox> &nbsp
-            <asp:Label ID="lbltip" runat="server" Text="(多個答案以 ; 分隔)"></asp:Label> &nbsp
-            <asp:Button ID="btnAddSelection" runat="server" Text="加入" OnClick="btnAddSelection_Click"/>
+
             <br /><br />
 
-            <asp:ImageButton ID="btnDelete" runat="server" ImageUrl="../Images/trash.png" width="30" height="30" /> 
+            <asp:Label ID="lblSelection" runat="server" Text="回答"></asp:Label> &nbsp
+            <asp:TextBox ID="txtSelection" runat="server" style="width:200px"></asp:TextBox> &nbsp
+
+            <asp:Label ID="lbltip" runat="server" Text="(多個答案以 ; 分隔)"></asp:Label> &nbsp
+            <asp:Button ID="btnAdd" runat="server" Text="加入" OnClick="btnAdd_Click"/>
+
+            <br /><br />
+
+            <asp:ImageButton ID="btnDelete" runat="server" ImageUrl="../Images/trash.png" width="30" height="30" OnClick="btnDelete_Click" /> 
 
             <asp:Literal ID="ltlMsg" runat="server"></asp:Literal>
             <asp:GridView class="table table-condensed" ID="gvProb" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvProb_RowDataBound" OnRowCancelingEdit="gvProb_RowCancelingEdit" OnRowCommand="gvProb_RowCommand" OnRowDeleting="gvProb_RowDeleting">
                 <Columns>
+
                     <asp:TemplateField>
                         <ItemTemplate>
                             <asp:CheckBox ID="ckbDelete" runat="server" />
                         </ItemTemplate>
                     </asp:TemplateField>
 
-                    <asp:TemplateField HeaderText="#">
-                         <ItemTemplate>
-                            <%#Container.DataItemIndex + 1%>
-                         </ItemTemplate>
-                    </asp:TemplateField>
+                    <asp:BoundField DataField="Count" HeaderText="#" />
 
                     <asp:BoundField DataField="Text" HeaderText="問題" />
+
                     <asp:TemplateField HeaderText="種類">
                             <ItemTemplate>
                                 <asp:Label ID="lblSelectionType" runat="server"></asp:Label>
                             </ItemTemplate>
                     </asp:TemplateField>
+
                     <asp:CheckBoxField DataField="IsMust" HeaderText="必填" />
-<%--                    <asp:TemplateField>
+
+                    <asp:TemplateField>
                         <ItemTemplate>
-                            <asp:Button ID="btnEdit" runat="server" Text="編輯" CommandName="ProbEdit" CommandArgument='<%# Eval("ProbID") %>'/>
+                            <asp:Button ID="btnEdit" runat="server" Text="編輯" CommandName="ProbEdit" CommandArgument='<%# Eval("ProbGuid") %>'/>
                         </ItemTemplate>
-                    </asp:TemplateField>--%>
+                    </asp:TemplateField>
+
                 </Columns>
             </asp:GridView>
-            <%--<table>
+
+            <table width="100%">
                 <tr>
                     <td align="right">
-                        <asp:Button ID="btnCancelP" runat="server" Text="Button" />
-                        <asp:Button ID="btnSendP" runat="server" Text="Button" />
+                        <asp:Button ID="btnCancelP" CssClass="btn btn-outline-dark" runat="server" Text="取消" OnClick="btnCancelP_Click" />
+                        <asp:Button ID="btnSendP" CssClass="btn btn-outline-success" runat="server" Text="送出" OnClick="btnSendP_Click" />
                     </td>
                 </tr>
-            </table>--%>
+            </table>
+
         </div>
+
+
 
         <div id="tabs3">
 
         </div>
+
+
 
         <div id="tabs4">
             

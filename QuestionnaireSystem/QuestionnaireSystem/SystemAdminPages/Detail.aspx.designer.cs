@@ -150,13 +150,13 @@ namespace QuestionnaireSystem.SystemAdminPages
         protected global::System.Web.UI.WebControls.Label lblText;
 
         /// <summary>
-        /// txtText 控制項。
+        /// txtQuestion 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtText;
+        protected global::System.Web.UI.WebControls.TextBox txtQuestion;
 
         /// <summary>
         /// ddlSelectionType 控制項。
@@ -213,13 +213,13 @@ namespace QuestionnaireSystem.SystemAdminPages
         protected global::System.Web.UI.WebControls.Label lbltip;
 
         /// <summary>
-        /// btnAddSelection 控制項。
+        /// btnAdd 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddSelection;
+        protected global::System.Web.UI.WebControls.Button btnAdd;
 
         /// <summary>
         /// btnDelete 控制項。
@@ -247,5 +247,23 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView gvProb;
+
+        /// <summary>
+        /// btnCancelP 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCancelP;
+
+        /// <summary>
+        /// btnSendP 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSendP;
     }
 }

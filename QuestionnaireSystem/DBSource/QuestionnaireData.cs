@@ -10,6 +10,8 @@ namespace DBSource
 {
     public class QuestionnaireData
     {
+        #region 列表頁與新增修改問卷
+
         /// <summary>
         /// 問卷查詢
         /// </summary>
@@ -80,38 +82,7 @@ namespace DBSource
         }
 
         /// <summary>
-        /// 以QuesGuid來取得問題資料表
-        /// </summary>
-        /// <param name="QuesGuid"></param>
-        /// <returns></returns>
-        public static DataTable GetProblemForBind(Guid QuesGuid)
-        {
-            string connectionString = DBHelper.GetConnectionString();
-            string dbCommandString =
-                $@"SELECT [ProbGuid]
-                        , [QuesGuid]
-                        , [Text]
-                        , [SelectionType]
-                        , [IsMust]
-                        , [Selection]
-                    FROM [Problem]
-                    WHERE [QuesGuid] = @quesGuid
-                ";
-            List<SqlParameter> list = new List<SqlParameter>();
-            list.Add(new SqlParameter("@quesGuid", QuesGuid));
-            try
-            {
-                return DBHelper.ReadDataTable(connectionString, dbCommandString, list);
-            }
-            catch (Exception ex)
-            {
-                logger.WriteLog(ex);
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 以QuesGuid來取得問卷資料行
+        /// 以 QuesGuid 取得問卷資料行
         /// </summary>
         /// <param name="QuesGuid"></param>
         /// <returns></returns>
@@ -146,7 +117,7 @@ namespace DBSource
         }
 
         /// <summary>
-        /// 以QuesID來刪除資料行
+        /// 以 QuesID 刪除資料行
         /// </summary>
         /// <param name="QuesID"></param>
         public static void DeleteQuestionnaireData(int QuesID)
@@ -202,7 +173,6 @@ namespace DBSource
             }
         }
 
-        #region 新增與修改問卷
         /// <summary>
         /// 新增問卷
         /// </summary>
@@ -256,6 +226,7 @@ namespace DBSource
                 logger.WriteLog(ex);
             }
         }
+
         /// <summary>
         /// 修改問卷
         /// </summary>
@@ -303,11 +274,153 @@ namespace DBSource
                 return false;
             }
         }
+
         #endregion
 
         #region 新增與修改問題
 
+        /// <summary>
+        /// 以 QuesGuid 取得問題資料表
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <returns></returns>
+        public static DataTable GetProblem(Guid QuesGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [ProbGuid]
+                        , [QuesGuid]
+                        , [Count]
+                        , [Text]
+                        , [SelectionType]
+                        , [IsMust]
+                        , [Selection]
+                    FROM [Problem]
+                    WHERE [QuesGuid] = @quesGuid
+                ";
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@quesGuid", QuesGuid));
+            try
+            {
+                return DBHelper.ReadDataTable(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
 
+        /// <summary>
+        /// 以 ProbGuid 取得該筆問題的內容
+        /// </summary>
+        /// <param name="ProbGuid"></param>
+        /// <returns></returns>
+        public static DataRow GetProblemDataRow(Guid ProbGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [ProbGuid]
+                        , [QuesGuid]
+                        , [Count]
+                        , [Text]
+                        , [SelectionType]
+                        , [IsMust]
+                        , [Selection]
+                    FROM [Problem]
+                    WHERE [ProbGuid] = @probGuid
+                ";
+
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@probGuid", ProbGuid));
+            try
+            {
+                return DBHelper.ReadDataRow(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 以 QuesGuid 刪除所有問卷中的問題
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        public static void DeleteProblemData(Guid QuesGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@" DELETE [Problem]
+                    WHERE [QuesGuid] = @quesGuid";
+
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+
+            try
+            {
+                DBHelper.ModifyData(connectionString, dbCommandString, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
+
+        /// <summary>
+        /// 以 Session["ProblemDT"] 更新問題
+        /// </summary>
+        /// <param name="ProbGuid"></param>
+        /// <param name="QuesGuid"></param>
+        /// <param name="Count"></param>
+        /// <param name="Text"></param>
+        /// <param name="SelectionType"></param>
+        /// <param name="IsMust"></param>
+        /// <param name="Selection"></param>
+        public static void UpdateProblem(Guid ProbGuid, Guid QuesGuid, int Count, string Text, int SelectionType, bool IsMust, string Selection)
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string dbCommand =
+                $@" INSERT INTO [Problem]
+                    (
+                          [ProbGuid]
+                        , [QuesGuid]
+                        , [Count]
+                        , [Text]
+                        , [SelectionType]
+                        , [IsMust]
+                        , [Selection]
+                    )
+                    VALUES
+                    (
+                        @probGuid
+                       ,@quesGuid
+                       ,@count
+                       ,@text
+                       ,@selectionType
+                       ,@isMust
+                       ,@selection
+                    )
+                ";
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@probGuid", ProbGuid));
+            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+            paramList.Add(new SqlParameter("@count", Count));
+            paramList.Add(new SqlParameter("@text", Text));
+            paramList.Add(new SqlParameter("@selectionType", SelectionType));
+            paramList.Add(new SqlParameter("@isMust", IsMust));
+            paramList.Add(new SqlParameter("@selection", Selection));
+
+            try
+            {
+                DBHelper.CreatData(connStr, dbCommand, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
         #endregion
     }
 }

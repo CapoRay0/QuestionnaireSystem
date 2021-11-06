@@ -15,6 +15,7 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            Session.Abandon(); // 清空所有 Session
 
             //#region 開發時隱藏
             //if (!AuthManager.IsLogined())
