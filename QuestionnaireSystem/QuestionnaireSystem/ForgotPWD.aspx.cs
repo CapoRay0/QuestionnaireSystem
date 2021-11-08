@@ -14,6 +14,12 @@ namespace QuestionnaireSystem
         {
 
         }
+
+        /// <summary>
+        /// 確認送出 >> 更改密碼
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnConfirm_Click(object sender, EventArgs e)
         {
             List<string> msgList = new List<string>();
@@ -32,6 +38,11 @@ namespace QuestionnaireSystem
             Response.Write("<Script language='JavaScript'>alert('您的密碼已更改成功!'); location.href='Login.aspx'; </Script>");
         }
 
+        /// <summary>
+        /// 檢查輸入值
+        /// </summary>
+        /// <param name="errorMsgList"></param>
+        /// <returns></returns>
         private bool CheckInput(out List<string> errorMsgList)
         {
             List<string> msgList = new List<string>();
@@ -106,6 +117,11 @@ namespace QuestionnaireSystem
                 return false;
         }
 
+        /// <summary>
+        /// 返回登入頁
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnBackToLogin_Click(object sender, EventArgs e)
         {
             Response.Redirect("Login.aspx");

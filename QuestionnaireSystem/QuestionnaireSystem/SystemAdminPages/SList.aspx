@@ -28,7 +28,7 @@
     <asp:ImageButton ID="btnNewForm" runat="server" ImageUrl="../Images/plus.png" width="30" height="30" OnClick="btnNewForm_Click" />
 
     <asp:Literal ID="ltlMsg" runat="server"></asp:Literal>
-    <asp:GridView class="table table-condensed" ID="gvSList" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvSlist_RowDataBound">
+    <asp:GridView class="table table-condensed" ID="gvSList" AlternatingRowStyle-Wrap="false" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvSlist_RowDataBound">
         <Columns>
             <asp:TemplateField>
                 <ItemTemplate>
@@ -64,6 +64,6 @@
 
     <uc1:UcPager runat="server" id="UcPager" PageSize="10" CurrentPage="1" Url="/SystemAdminPages/SList.aspx" />
 
-    <br /><br /><br />
+    <br /><br />
 
 </asp:Content>

@@ -123,5 +123,87 @@ namespace DBSource
                 return false;
             }
         }
+
+        /// <summary>
+        /// 檢查同一問卷中手機是否重複
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <param name="Phone"></param>
+        /// <returns></returns>
+        public static bool CheckPhoneIsRepeat(Guid QuesGuid, string Phone)
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string dbCommand =
+                $@" SELECT [Phone]
+                    FROM [ReplyInfo]
+                    WHERE [QuesGuid] = @quesGuid AND [Phone] = @phone";
+
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+            paramList.Add(new SqlParameter("@phone", Phone));
+
+            try
+            {
+                var dr = DBHelper.ReadDataRow(connStr, dbCommand, paramList);
+
+                if (dr != null)
+                {
+                    var OrigPhone = dr[0].ToString();
+                    if (Phone.Trim() == OrigPhone.Trim())
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 檢查同一問卷中Email是否重複
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <param name="Email"></param>
+        /// <returns></returns>
+        public static bool CheckEmailIsRepeat(Guid QuesGuid, string Email)
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string dbCommand =
+                $@" SELECT [Phone]
+                    FROM [ReplyInfo]
+                    WHERE [QuesGuid] = @quesGuid AND [Email] = @email";
+
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+            paramList.Add(new SqlParameter("@email", Email));
+
+            try
+            {
+                var dr = DBHelper.ReadDataRow(connStr, dbCommand, paramList);
+
+                if (dr != null)
+                {
+                    var OrigEmail = dr[0].ToString();
+                    if (Email.Trim() == OrigEmail.Trim())
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return false;
+            }
+        }
     }
 }

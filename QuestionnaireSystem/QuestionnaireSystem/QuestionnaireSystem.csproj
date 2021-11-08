@@ -100,6 +100,7 @@
     <Content Include="GeneralUserPages\GList.aspx" />
     <Content Include="GeneralUserPages\GStastic.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Images\form.png" />
     <Content Include="Images\plus.png" />
     <Content Include="Images\trash.png" />
     <Content Include="Login.aspx" />
@@ -107,6 +108,7 @@
     <Content Include="SystemAdminPages\Detail.aspx" />
     <Content Include="SystemAdminPages\SList.aspx" />
     <Content Include="SystemAdminPages\SStastic.aspx" />
+    <Content Include="UserControls\UcAddControl.ascx" />
     <Content Include="UserControls\UcPager.ascx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -223,6 +225,13 @@
     </Compile>
     <Compile Include="SystemAdminPages\SStastic.aspx.designer.cs">
       <DependentUpon>SStastic.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\UcAddControl.ascx.cs">
+      <DependentUpon>UcAddControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserControls\UcAddControl.ascx.designer.cs">
+      <DependentUpon>UcAddControl.ascx</DependentUpon>
     </Compile>
     <Compile Include="UserControls\UcPager.ascx.cs">
       <DependentUpon>UcPager.ascx</DependentUpon>

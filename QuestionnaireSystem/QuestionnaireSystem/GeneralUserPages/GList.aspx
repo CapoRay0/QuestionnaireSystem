@@ -22,10 +22,10 @@
             </td>
         </tr>
     </table>
-    <br /><br />
+    <br />
     
     <asp:Literal ID="ltlMsg" runat="server"></asp:Literal>
-    <asp:GridView class="table table-condensed" ID="gvGList" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvGList_RowDataBound">
+    <asp:GridView class="table table-condensed" ID="gvGList" AlternatingRowStyle-Wrap="false" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvGList_RowDataBound">
         <Columns>
             <asp:BoundField DataField="QuesID" HeaderText="#" />
             <asp:TemplateField HeaderText="問卷">
@@ -60,6 +60,6 @@
 
     <uc1:UcPager runat="server" ID="UcPager" PageSize="10" CurrentPage="1" Url="/GeneralUserPages/GList.aspx" />
 
-    <br /><br /><br />
+    <br /><br />
 
 </asp:Content>

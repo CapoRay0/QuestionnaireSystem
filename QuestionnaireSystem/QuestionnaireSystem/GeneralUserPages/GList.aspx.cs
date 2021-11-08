@@ -15,6 +15,8 @@ namespace QuestionnaireSystem.GeneralUserPages
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            Session.Abandon(); // 清空所有 Session
+
             dt = QuestionnaireData.GetQuestionnaire();
             var dtPaged = this.GetPagedDataTable(dt);
 

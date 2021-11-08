@@ -17,49 +17,39 @@ namespace QuestionnaireSystem.SystemAdminPages
 
             if (!IsPostBack)
             {
-                if (string.IsNullOrWhiteSpace(id)) //新增問卷
+                if (string.IsNullOrWhiteSpace(id)) // 新增問卷
                 {
                     this.txtStartDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
                     this.chkStatic.Checked = true;
                 }
-                else //編輯問卷
+                else // 編輯問卷
                 {
                     Guid idToGuid = Guid.Parse(id);
 
                     #region 問卷部分
-                    DataRow dr = QuestionnaireData.GetQuestionnaireDataRow(idToGuid);
+                    DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid); // 從 DB 抓問卷
 
-                    this.txtCaption.Text = dr["Caption"].ToString(); //帶入標題
-                    this.txtDescription.Text = dr["Description"].ToString(); //帶入描述
+                    this.txtCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
+                    this.txtDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
 
-                    if (dr["StartDate"].ToString() != "") //帶入開始日期
-                    {
-                        DateTime startDate = DateTime.Parse(dr["StartDate"].ToString());
-                        string StartString = startDate.ToString("yyyy-MM-dd");
-                        if (StartString != "1800-01-01")
-                            this.txtStartDate.Text = StartString;
-                    }
-                    else
-                        this.txtStartDate.Text = "";
-
-                    if (dr["EndDate"].ToString() != "") //帶入結束日期
-                    {
-                        DateTime endDate = DateTime.Parse(dr["EndDate"].ToString());
-                        string EndString = endDate.ToString("yyyy-MM-dd");
-                        if (EndString != "3000-12-31")
-                            this.txtEndDate.Text = EndString;
-                    }
-                    else
-                        this.txtEndDate.Text = "";
-
-                    if (dr["State"].ToString() == "1")  //帶入開放與否
+                    DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+                    string StartString = startDate.ToString("yyyy-MM-dd");
+                    if (StartString != "1800-01-01")
+                        this.txtStartDate.Text = StartString;
+                    
+                    DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+                    string EndString = endDate.ToString("yyyy-MM-dd");
+                    if (EndString != "3000-12-31")
+                        this.txtEndDate.Text = EndString;
+                    
+                    if (QuesRow["State"].ToString() == "1") // 帶入開放與否
                         this.chkStatic.Checked = true;
                     else
                         this.chkStatic.Checked = false;
                     #endregion
 
                     #region 問題部分
-                    DataTable ProblemDT = QuestionnaireData.GetProblem(idToGuid); // 從DB抓
+                    DataTable ProblemDT = QuestionnaireData.GetProblem(idToGuid); // 從 DB 抓問題
 
                     if (Session["ProblemDT"] == null)
                     {
@@ -92,7 +82,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                         this.btnDelete.Enabled = false;
                         this.ltlMsg.Text = "修改模式下無法刪除問題";
 
-                        //判斷 Session 是否有東西，有的話用 Session 回填，沒有則從 DB 抓
+                        // 判斷 Session 是否有東西，有的話用 Session 回填，沒有則從 DB 抓
                         if (Session["ProblemDT"] != null) // Session
                         {
                             Guid PbGuid = Guid.Parse(Session["PbGuid"].ToString());
@@ -311,7 +301,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                 }
                 Session["PbGuid"] = null;
             }
-            Session["ProblemDT"] = ProblemDT;
+            HttpContext.Current.Session["ProblemDT"] = ProblemDT;
             Response.Redirect($"/SystemAdminPages/Detail.aspx?ID={id}#tabs2");
         }
 
@@ -454,22 +444,24 @@ namespace QuestionnaireSystem.SystemAdminPages
             // 先刪除後加入
             QuestionnaireData.DeleteProblemData(idToGuid);
 
+            int Count = 0;
             for (int i = 0; i < SessionToDB.Rows.Count; i++)
             {
                 SessionToDB.Rows[i]["Count"] = i + 1;
                 Guid ProbGuid = (Guid)SessionToDB.Rows[i]["ProbGuid"];
                 Guid QuesGuid = (Guid)SessionToDB.Rows[i]["QuesGuid"];
-                int Count = (int)SessionToDB.Rows[i]["Count"];
+                Count = (int)SessionToDB.Rows[i]["Count"];
                 string Text = (string)SessionToDB.Rows[i]["Text"];
                 int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
                 bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
 
                 string Selection = "";
-                if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要
+                if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
                     Selection = (string)SessionToDB.Rows[i]["Selection"];
 
                 QuestionnaireData.UpdateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection);
             }
+            QuestionnaireData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
             Response.Write("<Script language='JavaScript'>alert('問題編輯成功!!'); location.href='SList.aspx'; </Script>");
         }
 

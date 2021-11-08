@@ -17,6 +17,22 @@
 <body>
     <form id="form1" runat="server">
 
+        <div class="container" style="height: 130px; background-color: rgb(240,240,240);">
+            <br />
+            <table>
+                <tr>
+                    <td width="30%" align="left">
+                        <h1>
+                            <img src="../Images/form.png" width="40" height="40" />
+                            <asp:Label ID="Label1" runat="server">動態問卷系統</asp:Label>
+                        </h1>
+                        <p>Questionnaire Maker - How you ask is everything</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
         <div class="col-md-3">
         </div>
 
@@ -26,6 +42,20 @@
         </div>
 
         <div class="col-md-3">
+        </div>
+
+
+        <div class="container" style="height: 110px; background-color: rgb(240,240,240);">
+            <br /><br />
+            <table width="100%">
+                <tr>
+                    <td align="center">
+                        <h4>
+                            <asp:Label CssClass="align-bottom" ID="Label3" runat="server">Copyright © [2021] [CapoRay]</asp:Label>
+                        </h4>
+                    </td>
+                </tr>
+            </table>
         </div>
 
     </form>

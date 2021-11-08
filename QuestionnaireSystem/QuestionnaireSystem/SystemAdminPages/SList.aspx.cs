@@ -53,7 +53,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                 this.UcPager.TotalSize = dt.Rows.Count;
                 this.UcPager.Bind();
             }
-            btnDelete.Attributes.Add("onclick ", "return confirm( '確定要將選取問卷刪除嗎?');"); // 刪除確認
+            btnDelete.Attributes.Add("onclick ", "return confirm( '確定要將選取的問卷及旗下全部問題都刪除嗎?');"); // 刪除確認
         }
 
         /// <summary>
@@ -119,9 +119,18 @@ namespace QuestionnaireSystem.SystemAdminPages
                 if (cb.Checked == true)
                 {
                     int quesIDToDelete = Convert.ToInt32(gvSList.Rows[i].Cells[1].Text);
-                    QuestionnaireData.DeleteQuestionnaireData(quesIDToDelete);
+                    QuestionnaireData.DeleteQuestionnaireData(quesIDToDelete); // 刪除問卷
+                    DataRow QuesDataRow = QuestionnaireData.GetQuesIDForDeleteProblem(quesIDToDelete);
+                    if(QuesDataRow != null)
+                    {
+                        string QuesStr = QuesDataRow[0].ToString();
+                        Guid QuesGuid = Guid.Parse(QuesStr); // 取得問卷Guid
+                        QuestionnaireData.DeleteProblemData(QuesGuid);// 刪除問卷中的所有問題
+                    }
                     Response.Write($"<Script language='JavaScript'>alert('問卷刪除成功!!'); location.href='{this.Request.RawUrl}'; </Script>");
                 }
+                else
+                    Response.Write($"<Script language='JavaScript'>alert('未選取任何問卷哦~'); location.href='{this.Request.RawUrl}'; </Script>");
             }
             this.gvSList.DataBind();
 
@@ -174,6 +183,10 @@ namespace QuestionnaireSystem.SystemAdminPages
                     lblEndDate.Text = "-";
                 else
                     lblEndDate.Text = QuesEndDate.ToString("yyyy-MM-dd");
+
+                DataRow curRow = ((DataRowView)e.Row.DataItem).Row;
+                if (curRow["Caption"].ToString().Length > 5)
+                    curRow["Caption"] = curRow["Caption"].ToString().Substring(0, 5) + "...";
             }
         }
 
@@ -219,5 +232,16 @@ namespace QuestionnaireSystem.SystemAdminPages
         }
         #endregion
 
+
+        ///// <summary>
+        ///// GridView 內建換頁
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //protected void gvSList_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        //{
+        //    gvSList.PageIndex = e.NewPageIndex;
+        //    this.gvSList.DataBind();
+        //}
     }
 }

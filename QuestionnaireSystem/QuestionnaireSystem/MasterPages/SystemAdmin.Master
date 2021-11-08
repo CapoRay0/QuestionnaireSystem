@@ -4,11 +4,11 @@
 
 <html>
 <head runat="server">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title></title>
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
-    
+
     <link href="../ExternalTools/css/bootstrap.css" rel="stylesheet" />
     <script src="../ExternalTools/js/bootstrap.js"></script>
     <script src="../ExternalTools/jquery-3.6.0.min.js"></script>
@@ -18,11 +18,12 @@
     <form id="form1" runat="server">
 
         <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#b0c4de;">
+            <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #b0c4de;">
                 &nbsp &nbsp &nbsp
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">  &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
                     <asp:Button CssClass="btn btn-outline-dark" ID="btnReload" runat="server" Text="重新整理" OnClick="btnReload_Click" />&nbsp &nbsp &nbsp
-                    <asp:Button CssClass="btn btn-outline-dark" ID="btnToDefault" runat="server" Text="返回列表頁" OnClick="btnToDefault_Click"/>&nbsp &nbsp &nbsp
+                    <asp:Button CssClass="btn btn-outline-dark" ID="btnToDefault" runat="server" Text="返回列表頁" OnClick="btnToDefault_Click" />&nbsp &nbsp &nbsp
                     <asp:Button CssClass="btn btn-outline-dark" ID="btnExit" runat="server" Text="離開系統" OnClick="btnExit_Click" />
                 </div>
             </nav>
@@ -30,16 +31,18 @@
         </div>
 
 
-
         <div class="col-md-3">
         </div>
 
-        <div align="center" class="container col-md-6">
+        <div align="left" class="container col-md-6">
             <br />
-            <h1>後台 - 問卷管理</h1><br />
+            <h1>後台 - 問卷管理</h1>
+            <br />
             <table>
                 <tr>
-                    <td width="150">
+                    <td width="150" valign="top">
+                        <br />
+                        <br />
                         <a href="Detail.aspx">新增問卷</a><br />
                         <a href="Common.aspx">常用問題管理</a><br />
                     </td>
@@ -53,6 +56,8 @@
 
         <div class="col-md-3">
         </div>
+
+        <div class="container" style="height: 30px; background-color: #b0c4de;"></div>
 
     </form>
 </body>

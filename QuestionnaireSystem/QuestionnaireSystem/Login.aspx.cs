@@ -20,6 +20,11 @@ namespace QuestionnaireSystem
             }
         }
 
+        /// <summary>
+        /// 驗證並登入
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             string inp_Account = this.txtAccount.Text; // inp 為 input
@@ -34,15 +39,15 @@ namespace QuestionnaireSystem
             }
 
             //驗證驗證碼
-            #region 開發時隱藏
+            //#region 開發時隱藏
 
-            if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
-            {
-                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
-                return;
-            }
+            //if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
+            //{
+            //    this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
+            //    return;
+            //}
 
-            #endregion
+            //#endregion
 
 
             //如果帳號=密碼就是第一次登入，導向到更改密碼頁
@@ -60,11 +65,21 @@ namespace QuestionnaireSystem
             
         }
 
+        /// <summary>
+        /// 忘記密碼
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnForgetPWD_Click(object sender, EventArgs e)
         {
             Response.Redirect("ForgotPWD.aspx");
         }
 
+        /// <summary>
+        /// 返回預設頁
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnDefault_Click(object sender, EventArgs e)
         {
             Response.Redirect("Default.aspx");

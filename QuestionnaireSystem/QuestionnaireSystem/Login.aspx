@@ -6,10 +6,9 @@
     <script>
         document.body.oncopy = function () {event.returnValue = false}
     </script>
-
-    <br /><br />
-    <h1>問卷系統後台管理</h1>
-    <br /><br />
+    <br />
+    <h2>問卷系統後台管理</h2>
+    <br />
     <div>
         <asp:Label CssClass="col-form-label-lg" ID="lblAccount" runat="server" Text="帳號："></asp:Label><br />
         <asp:TextBox CssClass="form-control" ID="txtAccount" runat="server" placeholder="在此輸入您的帳號"></asp:TextBox><br />
@@ -27,5 +26,5 @@
     </div>
     <br />
     <asp:Button CssClass="btn btn-outline-success" ID="btnDefault" runat="server" Text="返回預設頁" OnClick="btnDefault_Click"/> &nbsp &nbsp
-
+    <br /><br />
 </asp:Content>

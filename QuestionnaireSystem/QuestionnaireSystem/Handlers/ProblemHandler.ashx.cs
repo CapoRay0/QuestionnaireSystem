@@ -12,7 +12,10 @@ namespace QuestionnaireSystem.Handlers
     /// </summary>
     public class ProblemHandler : IHttpHandler
     {
-
+        /// <summary>
+        /// 透過 QuesGuid 取得問題資料表，送到 Form.aspx 讓AJAX動態新增控制項
+        /// </summary>
+        /// <param name="context"></param>
         public void ProcessRequest(HttpContext context)
         {
 
@@ -26,7 +29,7 @@ namespace QuestionnaireSystem.Handlers
             }
 
             Guid idToGuid = Guid.Parse(id);
-            DataTable dt = QuestionnaireData.GetProblem(idToGuid);
+            DataTable dt = QuestionnaireData.GetProblem(idToGuid); // 取得問題資料表
             string jsonText = Newtonsoft.Json.JsonConvert.SerializeObject(dt);
 
             context.Response.ContentType = "application/json";

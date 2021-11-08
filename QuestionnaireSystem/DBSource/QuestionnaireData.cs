@@ -141,6 +141,34 @@ namespace DBSource
         }
 
         /// <summary>
+        /// 透過 QuesID 取得 QuesGuid 來刪除問卷中的所有問題
+        /// </summary>
+        /// <param name="QuesID"></param>
+        /// <returns></returns>
+        public static DataRow GetQuesIDForDeleteProblem(int QuesID)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [QuesGuid]
+                    FROM [Questionnaire]
+                    WHERE [QuesID] = @quesID
+                ";
+
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@quesID", QuesID));
+
+            try
+            {
+                return DBHelper.ReadDataRow(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 因結束時間已到而關閉問卷
         /// </summary>
         /// <param name="QuesID"></param>
@@ -297,6 +325,7 @@ namespace DBSource
                         , [Selection]
                     FROM [Problem]
                     WHERE [QuesGuid] = @quesGuid
+                    ORDER BY [Count] ASC
                 ";
             List<SqlParameter> list = new List<SqlParameter>();
             list.Add(new SqlParameter("@quesGuid", QuesGuid));
@@ -369,7 +398,7 @@ namespace DBSource
         }
 
         /// <summary>
-        /// 以 Session["ProblemDT"] 更新問題
+        /// 以 Session["ProblemDT"] 新增問題
         /// </summary>
         /// <param name="ProbGuid"></param>
         /// <param name="QuesGuid"></param>
@@ -419,6 +448,42 @@ namespace DBSource
             catch (Exception ex)
             {
                 logger.WriteLog(ex);
+            }
+        }
+
+        /// <summary>
+        /// 新增問題後更新問卷的問題數
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <param name="Count"></param>
+        /// <returns></returns>
+        public static bool UpdateQuestionnaireCount(Guid QuesGuid, int Count)
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string dbCommand =
+                $@" UPDATE [Questionnaire]
+                    SET
+                        [Count]    = @count
+                    WHERE
+                        [QuesGuid] = @quesGuid";
+
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+            paramList.Add(new SqlParameter("@count", Count));
+
+            try
+            {
+                int effectRows = DBHelper.ModifyData(connStr, dbCommand, paramList);
+
+                if (effectRows == 1)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return false;
             }
         }
         #endregion
