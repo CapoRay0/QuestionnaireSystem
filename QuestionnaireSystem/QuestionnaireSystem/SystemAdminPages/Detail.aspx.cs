@@ -24,6 +24,16 @@ namespace QuestionnaireSystem.SystemAdminPages
                 }
                 else if (!string.IsNullOrWhiteSpace(id) && id.Length == 36) // 編輯問卷
                 {
+                    // 套用常用問題
+                    var commonProb = CommonProblem.GetCommon();
+                    this.ddlCommon.DataSource = commonProb;
+                    this.ddlCommon.DataTextField = "Name";
+                    this.ddlCommon.DataValueField = "CommID";
+                    this.ddlCommon.DataBind();
+
+                    // 用 LinkButton 才可處理 PostBack 問題
+                    this.lkbCommon.PostBackUrl = $"/SystemAdminPages/Detail.aspx?ID={id}#tabs2";
+
                     Guid idToGuid = Guid.Parse(id);
 
                     #region 問卷部分
@@ -240,6 +250,32 @@ namespace QuestionnaireSystem.SystemAdminPages
         #region 問題
 
         /// <summary>
+        /// 用 LinkButton 套用常用問題
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void lkbCommon_Click(object sender, EventArgs e)
+        {
+            int commonID;
+            if(int.TryParse(this.ddlCommon.SelectedValue, out commonID))
+            {
+                DataRow commRow = CommonProblem.GetCommonByCommID(commonID);
+
+                this.txtQuestion.Text = commRow["Text"].ToString();
+
+                int type = Convert.ToInt32(commRow["SelectionType"]);
+                this.ddlSelectionType.SelectedValue = type.ToString();
+
+                this.ckbIsMust.Checked = (bool)commRow["IsMust"];
+
+                if (type == 0 || type == 1)
+                    this.txtSelection.Text = commRow["Selection"].ToString();
+                else
+                    this.txtSelection.Text = "";
+            }
+        }
+
+        /// <summary>
         /// 新增 / 修改問題
         /// </summary>
         /// <param name="sender"></param>
@@ -252,13 +288,20 @@ namespace QuestionnaireSystem.SystemAdminPages
                 Response.Write($"<Script language='JavaScript'>alert('請先新增問卷'); location.href='SList.aspx'; </Script>");
                 return;
             }
-            Guid idToGuid = Guid.Parse(id);
-
-            if (this.txtQuestion.Text == "")
+            if (string.IsNullOrWhiteSpace(this.txtQuestion.Text))
             {
                 Response.Write($"<Script language='JavaScript'>alert('請輸入問題名稱'); location.href='Detail.aspx?ID={id}#tabs2'; </Script>");
                 return;
             }
+            // 單選或複選的回答不能為空值
+            int type = Convert.ToInt32(this.ddlSelectionType.SelectedValue);
+            if (string.IsNullOrWhiteSpace(this.txtSelection.Text) && (type == 0 || type == 1))
+            {
+                Response.Write($"<Script language='JavaScript'>alert('請輸入回答'); location.href='Detail.aspx?ID={id}#tabs2'; </Script>");
+                return;
+            }
+
+            Guid idToGuid = Guid.Parse(id);
 
             // 將資料庫的舊問題及頁面上加入的新問題一起放至新增的 DataTable 並存入 Session 中
             DataTable ProblemDT = new DataTable();

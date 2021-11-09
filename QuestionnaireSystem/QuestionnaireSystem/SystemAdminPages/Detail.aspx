@@ -2,10 +2,12 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="/resources/demos/style.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <%--<link rel="stylesheet" href="/resources/demos/style.css">--%>
+  <%--<script src="https://code.jquery.com/jquery-3.6.0.js"></script>--%>
   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
     <script>
         $(function () {
             $("#tabs").tabs();
@@ -61,9 +63,10 @@
 
         <div id="tabs2">
             <table width="500px"></table>
-            <asp:Label ID="ltlSelectionType" runat="server" Text="種類"></asp:Label> &nbsp
+            <asp:Label ID="lblSelectionType" runat="server" Text="種類"></asp:Label> &nbsp
             <asp:DropDownList ID="ddlCommon" runat="server" style="width:150px"></asp:DropDownList>
-
+            <asp:LinkButton ID="lkbCommon" runat="server" OnClick="lkbCommon_Click">套用</asp:LinkButton>
+            
             <br /><br />
 
             <asp:Label ID="lblText" runat="server" Text="問題"></asp:Label> &nbsp

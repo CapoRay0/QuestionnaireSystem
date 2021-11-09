@@ -123,13 +123,13 @@ namespace QuestionnaireSystem.SystemAdminPages
         protected global::System.Web.UI.WebControls.Button btnSend;
 
         /// <summary>
-        /// ltlSelectionType 控制項。
+        /// lblSelectionType 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label ltlSelectionType;
+        protected global::System.Web.UI.WebControls.Label lblSelectionType;
 
         /// <summary>
         /// ddlCommon 控制項。
@@ -139,6 +139,15 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlCommon;
+
+        /// <summary>
+        /// lkbCommon 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton lkbCommon;
 
         /// <summary>
         /// lblText 控制項。

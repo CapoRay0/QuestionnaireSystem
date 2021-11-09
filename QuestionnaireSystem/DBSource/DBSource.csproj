@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthManager.cs" />
+    <Compile Include="CommonProblem.cs" />
     <Compile Include="DBHelper.cs" />
     <Compile Include="logger.cs" />
     <Compile Include="ProblemData.cs" />
