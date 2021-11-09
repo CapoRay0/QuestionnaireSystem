@@ -143,17 +143,17 @@
         </tr>
         <tr>
             <td>
-                <asp:Label ID="lblName" runat="server" Text="姓名"></asp:Label>&nbsp &nbsp &nbsp
+                <asp:Label ID="lblName" runat="server" Text="姓名"></asp:Label>&nbsp &nbsp &nbsp &nbsp &nbsp
                 <asp:TextBox ID="txtName" runat="server" Style="width: 250px"></asp:TextBox><br /><br />
 
-                <asp:Label ID="lblPhone" runat="server" Text="手機"></asp:Label>&nbsp &nbsp &nbsp
-                <asp:TextBox ID="txtPhone" runat="server" Style="width: 250px"></asp:TextBox><br /><br />
+                <asp:Label ID="lblPhone" runat="server" Text="手機"></asp:Label>&nbsp &nbsp &nbsp &nbsp &nbsp
+                <asp:TextBox ID="txtPhone" runat="server" Style="width: 250px" TextMode="Phone"></asp:TextBox><br /><br />
 
-                <asp:Label ID="lblEmail" runat="server" Text="Email"></asp:Label>&nbsp &nbsp
-                <asp:TextBox ID="txtEmail" runat="server" Style="width: 250px"></asp:TextBox><br /><br />
+                <asp:Label ID="lblEmail" runat="server" Text="Email"></asp:Label>&nbsp &nbsp &nbsp &nbsp
+                <asp:TextBox ID="txtEmail" runat="server" Style="width: 250px" TextMode="Email"></asp:TextBox><br /><br />
 
-                <asp:Label ID="lblAge" runat="server" Text="年齡"></asp:Label>&nbsp &nbsp &nbsp
-                <asp:TextBox ID="txtAge" runat="server" Style="width: 250px"></asp:TextBox><br /><br />
+                <asp:Label ID="lblAge" runat="server" Text="年齡"></asp:Label>&nbsp &nbsp &nbsp &nbsp &nbsp
+                <asp:TextBox ID="txtAge" runat="server" Style="width: 250px" TextMode="Number"></asp:TextBox><br /><br />
             </td>
         </tr>
     </table>

@@ -17,49 +17,62 @@ namespace QuestionnaireSystem.GeneralUserPages
 
             if (!IsPostBack)
             {
-                if (!string.IsNullOrWhiteSpace(id) && id.Length == 36)
+                if (string.IsNullOrWhiteSpace(id) || id.Length != 36)
                 {
-                    Guid idToGuid = Guid.Parse(id);
-                    DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid);  // 從 DB 抓問卷
-                    if (QuesRow != null && QuesRow["QuesGuid"].ToString() == id)
-                    {
-                        DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
-                        string StartString = startDate.ToString("yyyy/MM/dd");
-                        if (StartString != "1800/01/01")
-                            this.lblDuring.Text += StartString;
-                        else
-                            this.lblDuring.Text += "";
-
-                        this.lblDuring.Text += " ~ "; // 開始日期與結束日期間的分隔
-
-                        DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
-                        string EndString = endDate.ToString("yyyy/MM/dd");
-                        if (EndString != "3000/12/31")
-                            this.lblDuring.Text += EndString;
-                        else
-                            this.lblDuring.Text += "";
-
-                        this.lblCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
-                        this.lblDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
-
-
-                        this.lblCount.Text = "共 " + QuesRow["Count"].ToString() + " 個問題";
-                    }
-                    else
-                        Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
-
-                    // 從確認頁返回問卷填寫頁修改資料時回填
-                    if (Session["Name"] != null)
-                        this.txtName.Text = Session["Name"].ToString();
-                    if (Session["Phone"] != null)
-                        this.txtPhone.Text = Session["Phone"].ToString();
-                    if (Session["Email"] != null)
-                        this.txtEmail.Text = Session["Email"].ToString();
-                    if (Session["Age"] != null)
-                        this.txtAge.Text = Session["Age"].ToString();
-                }
-                else
                     Response.Write("<Script language='JavaScript'>alert(' QueryString 錯誤，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
+                    return;
+                }
+
+                Guid idToGuid = Guid.Parse(id);
+                DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid);  // 從 DB 抓問卷
+
+                if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                {
+                    Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
+                    return;
+                }
+
+                DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+                string StartString = startDate.ToString("yyyy/MM/dd");
+                if (StartString != "1800/01/01")
+                    this.lblDuring.Text += StartString;
+                else
+                    this.lblDuring.Text += "";
+
+                this.lblDuring.Text += " ~ "; // 開始日期與結束日期間的分隔
+
+                DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+                string EndString = endDate.ToString("yyyy/MM/dd");
+                if (EndString != "3000/12/31")
+                    this.lblDuring.Text += EndString;
+                else
+                    this.lblDuring.Text += "";
+
+                // 判斷問卷日期是否過期
+                DateTime nowDate = DateTime.Now;
+                if ((nowDate - startDate).Days < 0 || (nowDate - endDate).Days > 0)
+                    Response.Write("<Script language='JavaScript'>alert('此問卷已經過期，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
+
+                // 判斷問卷狀態是否關閉
+                if (Convert.ToInt32(QuesRow["State"]) == 0)
+                    Response.Write("<Script language='JavaScript'>alert('此問卷已經關閉，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
+
+                this.lblCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
+                this.lblDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+
+
+                this.lblCount.Text = "共 " + QuesRow["Count"].ToString() + " 個問題";
+
+
+                // 從確認頁返回問卷填寫頁修改資料時回填
+                if (Session["Name"] != null)
+                    this.txtName.Text = Session["Name"].ToString();
+                if (Session["Phone"] != null)
+                    this.txtPhone.Text = Session["Phone"].ToString();
+                if (Session["Email"] != null)
+                    this.txtEmail.Text = Session["Email"].ToString();
+                if (Session["Age"] != null)
+                    this.txtAge.Text = Session["Age"].ToString();
 
             }
         }
@@ -87,7 +100,7 @@ namespace QuestionnaireSystem.GeneralUserPages
 
             string id = this.Request.QueryString["ID"];
             Guid idToGuid = Guid.Parse(id);
-            DataTable ProblemDT = QuestionnaireData.GetProblem(idToGuid); // 從 DB 抓問題
+            DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 從 DB 抓問題
 
             string reply = string.Empty; // 裝回答 (以分號分隔)
 
@@ -107,7 +120,14 @@ namespace QuestionnaireSystem.GeneralUserPages
                 }
                 else
                 {
-                    reply += this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()]; // 取回答值
+                    string inpValue = this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()];
+                    if (inpValue.Contains(";"))
+                    {
+                        Response.Write("<Script language='JavaScript'>alert('回答中不能包含分號'); </Script>");
+                        return;
+                    }
+
+                    reply += inpValue; // 取回答值
 
                     // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等
                     if (i < ProblemDT.Rows.Count - 1) // 最後一題才不加分號
@@ -139,7 +159,13 @@ namespace QuestionnaireSystem.GeneralUserPages
             // 個人基本資料檢查
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(age))
             {
-                Response.Write("<Script language='JavaScript'>alert('個人基本資料尚未填妥'); </Script>");
+                Response.Write("<Script language='JavaScript'>alert('請確認個人基本資料是否正確'); </Script>");
+                return;
+            }
+
+            if (name.Contains(";") || phone.Contains(";") || email.Contains(";") || age.Contains(";"))
+            {
+                Response.Write("<Script language='JavaScript'>alert('個人基本資料不能包含分號'); </Script>");
                 return;
             }
 

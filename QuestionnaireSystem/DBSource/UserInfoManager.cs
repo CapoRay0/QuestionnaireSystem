@@ -19,7 +19,7 @@ namespace DBSource
         {
             string connectionString = DBHelper.GetConnectionString();
             string dbCommandString =
-                $@"SELECT [SystemID]
+                $@"SELECT [SystemGuid]
                         , [Name]
                         , [Phone]
                         , [Email]
@@ -175,7 +175,7 @@ namespace DBSource
         {
             string connStr = DBHelper.GetConnectionString();
             string dbCommand =
-                $@" SELECT [Phone]
+                $@" SELECT [Email]
                     FROM [ReplyInfo]
                     WHERE [QuesGuid] = @quesGuid AND [Email] = @email";
 

@@ -39,7 +39,7 @@ namespace DBSource
             }
 
             UserInfoModel model = new UserInfoModel();
-            model.SystemID = ((Guid)dr["SystemID"]);
+            model.SystemGuid = ((Guid)dr["SystemID"]);
             model.Name = dr["Name"].ToString();
             model.Phone = dr["Phone"].ToString();
             model.Email = dr["Email"].ToString();

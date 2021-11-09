@@ -29,7 +29,7 @@ namespace QuestionnaireSystem.Handlers
             }
 
             Guid idToGuid = Guid.Parse(id);
-            DataTable dt = QuestionnaireData.GetProblem(idToGuid); // 取得問題資料表
+            DataTable dt = ProblemData.GetProblem(idToGuid); // 取得問題資料表
             string jsonText = Newtonsoft.Json.JsonConvert.SerializeObject(dt);
 
             context.Response.ContentType = "application/json";

@@ -10,7 +10,7 @@ namespace DBSource
     {
         #region 帳號下轄參數
 
-        public Guid SystemID { get; set; }
+        public Guid SystemGuid { get; set; }
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }

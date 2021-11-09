@@ -40,8 +40,8 @@
     <table width="100%">
         <tr>
             <td align="right">
-                <asp:Label ID="lblCount" runat="server" Text="共 0 個問題" Style="font-size: 20px"></asp:Label><br /><br /><br />
-                <asp:Button ID="btnCancelC" CssClass="btn btn-outline-dark" runat="server" Text="取消" OnClick="btnCancelC_Click"/>
+                <br /><br />
+                <asp:Button ID="btnEditC" CssClass="btn btn-outline-dark" runat="server" Text="修改" OnClick="btnEditC_Click"/>
                 &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp 
                 <asp:Button ID="btnSendC" CssClass="btn btn-success" runat="server" Text="送出" OnClick="btnSendC_Click"/>
             </td>

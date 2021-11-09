@@ -125,7 +125,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                     {
                         string QuesStr = QuesDataRow[0].ToString();
                         Guid QuesGuid = Guid.Parse(QuesStr); // 取得問卷Guid
-                        QuestionnaireData.DeleteProblemData(QuesGuid);// 刪除問卷中的所有問題
+                        ProblemData.DeleteProblemData(QuesGuid);// 刪除問卷中的所有問題
                     }
                     Response.Write($"<Script language='JavaScript'>alert('問卷刪除成功!!'); location.href='{this.Request.RawUrl}'; </Script>");
                 }

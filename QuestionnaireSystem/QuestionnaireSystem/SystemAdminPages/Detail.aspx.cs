@@ -22,12 +22,19 @@ namespace QuestionnaireSystem.SystemAdminPages
                     this.txtStartDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
                     this.chkStatic.Checked = true;
                 }
-                else // 編輯問卷
+                else if (!string.IsNullOrWhiteSpace(id) && id.Length == 36) // 編輯問卷
                 {
                     Guid idToGuid = Guid.Parse(id);
 
                     #region 問卷部分
                     DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid); // 從 DB 抓問卷
+
+                    //先判斷 QuesGuid 是否有誤
+                    if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                    {
+                        Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='SList.aspx'; </Script>");
+                        return;
+                    }
 
                     this.txtCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
                     this.txtDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
@@ -36,12 +43,12 @@ namespace QuestionnaireSystem.SystemAdminPages
                     string StartString = startDate.ToString("yyyy-MM-dd");
                     if (StartString != "1800-01-01")
                         this.txtStartDate.Text = StartString;
-                    
+
                     DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
                     string EndString = endDate.ToString("yyyy-MM-dd");
                     if (EndString != "3000-12-31")
                         this.txtEndDate.Text = EndString;
-                    
+
                     if (QuesRow["State"].ToString() == "1") // 帶入開放與否
                         this.chkStatic.Checked = true;
                     else
@@ -49,7 +56,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                     #endregion
 
                     #region 問題部分
-                    DataTable ProblemDT = QuestionnaireData.GetProblem(idToGuid); // 從 DB 抓問題
+                    DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 從 DB 抓問題
 
                     if (Session["ProblemDT"] == null)
                     {
@@ -103,7 +110,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                         else // 進頁面後直接修改 DB (只會跑第一次)
                         {
                             Guid PbGuid = Guid.Parse(Session["PbGuid"].ToString());
-                            DataRow OneProblem = QuestionnaireData.GetProblemDataRow(PbGuid);
+                            DataRow OneProblem = ProblemData.GetProblemDataRow(PbGuid);
                             if (OneProblem != null)
                             {
                                 this.txtQuestion.Text = OneProblem["Text"].ToString();
@@ -115,8 +122,12 @@ namespace QuestionnaireSystem.SystemAdminPages
                     }
                     #endregion
                 }
+                else
+                    Response.Write("<Script language='JavaScript'>alert(' QueryString 錯誤，將您導向回列表頁'); location.href='SList.aspx'; </Script>");
             }
         }
+
+        #region 問卷
 
         /// <summary>
         /// 清空問卷資料
@@ -224,6 +235,10 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         }
 
+        #endregion
+
+        #region 問題
+
         /// <summary>
         /// 新增 / 修改問題
         /// </summary>
@@ -249,7 +264,7 @@ namespace QuestionnaireSystem.SystemAdminPages
             DataTable ProblemDT = new DataTable();
 
             if (Session["ProblemDT"] == null)
-                ProblemDT = QuestionnaireData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                ProblemDT = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
             else
                 ProblemDT = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
 
@@ -360,7 +375,7 @@ namespace QuestionnaireSystem.SystemAdminPages
             DataTable DTforDelete = new DataTable();
 
             if (Session["ProblemDT"] == null)
-                DTforDelete = QuestionnaireData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                DTforDelete = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
             else
                 DTforDelete = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
 
@@ -411,13 +426,12 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// <param name="e"></param>
         protected void btnCancelP_Click(object sender, EventArgs e)
         {
-            Session["PbGuid"] = null;
-            Session["ProblemDT"] = null;
-            Response.Redirect("/SystemAdminPages/SList.aspx");
+            Response.Redirect("/SystemAdminPages/SList.aspx"); // Session 將於列表頁進行 Abandon
+            return;
         }
 
         /// <summary>
-        /// 將 Session 中的問題送進資料庫做真正的新增與更改
+        /// 送出問題：將 Session 送進資料庫做真正的新增與更改
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -429,12 +443,13 @@ namespace QuestionnaireSystem.SystemAdminPages
                 Response.Write($"<Script language='JavaScript'>alert('請先新增問卷'); location.href='SList.aspx'; </Script>");
                 return;
             }
-            Guid idToGuid = Guid.Parse(id);
 
+            Guid idToGuid = Guid.Parse(id);
             DataTable SessionToDB;
+
             if (Session["ProblemDT"] == null)
             {
-                SessionToDB = QuestionnaireData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                SessionToDB = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
                 Response.Write($"<Script language='JavaScript'>alert('好像什麼都沒變哦~'); location.href='Detail.aspx?ID={id}#tabs2'; </Script>");
                 return;
             }
@@ -442,7 +457,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                 SessionToDB = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
 
             // 先刪除後加入
-            QuestionnaireData.DeleteProblemData(idToGuid);
+            ProblemData.DeleteProblemData(idToGuid);
 
             int Count = 0;
             for (int i = 0; i < SessionToDB.Rows.Count; i++)
@@ -457,14 +472,26 @@ namespace QuestionnaireSystem.SystemAdminPages
 
                 string Selection = "";
                 if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
+                {
                     Selection = (string)SessionToDB.Rows[i]["Selection"];
+                    StaticData.DeleteStaticData(QuesGuid); // *先刪除統計資料
+                    
+                    string[] OptionText = Selection.Split(';');
 
-                QuestionnaireData.UpdateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection);
+                    for(int j = 0; j < OptionText.Length; j++)
+                    {
+                        int StaticCount = 0;
+                        StaticData.CreateStaticData(QuesGuid, ProbGuid, OptionText[j], StaticCount); // *後新增出來
+                    }
+                }
+
+
+                ProblemData.CreateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection);
             }
-            QuestionnaireData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
+
+            ProblemData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
             Response.Write("<Script language='JavaScript'>alert('問題編輯成功!!'); location.href='SList.aspx'; </Script>");
         }
-
 
 
         protected void gvProb_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
@@ -476,6 +503,10 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         }
 
+        #endregion
 
+        //---------------------------------------------------------填寫資料-----------------------------------------------------------
+
+        //----------------------------------------------------------統計------------------------------------------------------------
     }
 }

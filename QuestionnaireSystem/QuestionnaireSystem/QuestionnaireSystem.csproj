@@ -107,7 +107,6 @@
     <Content Include="SystemAdminPages\Common.aspx" />
     <Content Include="SystemAdminPages\Detail.aspx" />
     <Content Include="SystemAdminPages\SList.aspx" />
-    <Content Include="SystemAdminPages\SStastic.aspx" />
     <Content Include="UserControls\UcAddControl.ascx" />
     <Content Include="UserControls\UcPager.ascx" />
     <Content Include="Web.config" />
@@ -218,13 +217,6 @@
     </Compile>
     <Compile Include="SystemAdminPages\SList.aspx.designer.cs">
       <DependentUpon>SList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="SystemAdminPages\SStastic.aspx.cs">
-      <DependentUpon>SStastic.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="SystemAdminPages\SStastic.aspx.designer.cs">
-      <DependentUpon>SStastic.aspx</DependentUpon>
     </Compile>
     <Compile Include="UserControls\UcAddControl.ascx.cs">
       <DependentUpon>UcAddControl.ascx</DependentUpon>
