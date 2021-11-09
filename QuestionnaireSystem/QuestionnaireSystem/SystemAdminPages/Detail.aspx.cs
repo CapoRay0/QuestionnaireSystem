@@ -470,15 +470,16 @@ namespace QuestionnaireSystem.SystemAdminPages
                 int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
                 bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
 
+                StaticData.DeleteStaticData(QuesGuid); // *先刪除統計資料
+
                 string Selection = "";
                 if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
                 {
                     Selection = (string)SessionToDB.Rows[i]["Selection"];
-                    StaticData.DeleteStaticData(QuesGuid); // *先刪除統計資料
-                    
+
                     string[] OptionText = Selection.Split(';');
 
-                    for(int j = 0; j < OptionText.Length; j++)
+                    for (int j = 0; j < OptionText.Length; j++)
                     {
                         int StaticCount = 0;
                         StaticData.CreateStaticData(QuesGuid, ProbGuid, OptionText[j], StaticCount); // *後新增出來

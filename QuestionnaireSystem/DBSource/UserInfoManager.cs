@@ -44,6 +44,56 @@ namespace DBSource
         }
 
         /// <summary>
+        /// 新增問卷管理帳號
+        /// </summary>
+        /// <param name="SystemGuid"></param>
+        /// <param name="Name"></param>
+        /// <param name="Phone"></param>
+        /// <param name="Email"></param>
+        /// <param name="Account"></param>
+        /// <param name="Pwd"></param>
+        public static void CreateReplyInfo(Guid SystemGuid, string Name, string Phone, string Email, string Account, string Pwd)
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string dbCommand =
+                $@" INSERT INTO [SystemInfo]
+                    (
+                          [SystemGuid]
+                        , [Name]
+                        , [Phone]
+                        , [Email]
+                        , [Account]
+                        , [Password]
+                    )
+                    VALUES
+                    (
+                        @systemGuid
+                       ,@name
+                       ,@phone
+                       ,@email
+                       ,@account
+                       ,@pwd
+                    )
+                ";
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@systemGuid", SystemGuid));
+            paramList.Add(new SqlParameter("@name", Name));
+            paramList.Add(new SqlParameter("@phone", Phone));
+            paramList.Add(new SqlParameter("@email", Email));
+            paramList.Add(new SqlParameter("@account", Account));
+            paramList.Add(new SqlParameter("@pwd", Pwd));
+
+            try
+            {
+                DBHelper.CreatData(connStr, dbCommand, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
+
+        /// <summary>
         /// 透過手機與Email來更改密碼
         /// </summary>
         /// <param name="Phone"></param>

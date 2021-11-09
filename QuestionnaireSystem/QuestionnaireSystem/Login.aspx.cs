@@ -84,5 +84,15 @@ namespace QuestionnaireSystem
         {
             Response.Redirect("Default.aspx");
         }
+
+        /// <summary>
+        /// 新增問卷管理帳號
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnCreate_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("CreateSystemInfo.aspx");
+        }
     }
 }

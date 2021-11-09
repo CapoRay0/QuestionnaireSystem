@@ -11,8 +11,62 @@ namespace QuestionnaireSystem
 {
 
 
-    public partial class Login
+    public partial class CreateSystemInfo
     {
+
+        /// <summary>
+        /// lblName 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblName;
+
+        /// <summary>
+        /// txtName 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtName;
+
+        /// <summary>
+        /// lblPhone 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPhone;
+
+        /// <summary>
+        /// txtPhone 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPhone;
+
+        /// <summary>
+        /// lblEmail 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblEmail;
+
+        /// <summary>
+        /// txtEmail 控制項。
+        /// </summary>
+        /// <remarks>
+        /// 自動產生的欄位。
+        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtEmail;
 
         /// <summary>
         /// lblAccount 控制項。
@@ -33,58 +87,40 @@ namespace QuestionnaireSystem
         protected global::System.Web.UI.WebControls.TextBox txtAccount;
 
         /// <summary>
-        /// lblPWD 控制項。
+        /// lblPwd 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblPWD;
+        protected global::System.Web.UI.WebControls.Label lblPwd;
 
         /// <summary>
-        /// txtPWD 控制項。
+        /// txtPwd 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPWD;
+        protected global::System.Web.UI.WebControls.TextBox txtPwd;
 
         /// <summary>
-        /// lblVerification 控制項。
+        /// lblPwdConf 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblVerification;
+        protected global::System.Web.UI.WebControls.Label lblPwdConf;
 
         /// <summary>
-        /// txtConfirmCode 控制項。
+        /// txtPwdConf 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtConfirmCode;
-
-        /// <summary>
-        /// btnLogin 控制項。
-        /// </summary>
-        /// <remarks>
-        /// 自動產生的欄位。
-        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnLogin;
-
-        /// <summary>
-        /// btnForgetPWD 控制項。
-        /// </summary>
-        /// <remarks>
-        /// 自動產生的欄位。
-        /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnForgetPWD;
+        protected global::System.Web.UI.WebControls.TextBox txtPwdConf;
 
         /// <summary>
         /// lblMsg 控制項。
@@ -96,21 +132,21 @@ namespace QuestionnaireSystem
         protected global::System.Web.UI.WebControls.Label lblMsg;
 
         /// <summary>
-        /// btnDefault 控制項。
+        /// btnBackToLogin 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnDefault;
+        protected global::System.Web.UI.WebControls.Button btnBackToLogin;
 
         /// <summary>
-        /// btnCreate 控制項。
+        /// btnConfirm 控制項。
         /// </summary>
         /// <remarks>
         /// 自動產生的欄位。
         /// 若要修改，請將欄位宣告從設計工具檔案移到程式碼後置檔案。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCreate;
+        protected global::System.Web.UI.WebControls.Button btnConfirm;
     }
 }

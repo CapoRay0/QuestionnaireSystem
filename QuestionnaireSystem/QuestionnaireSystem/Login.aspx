@@ -26,5 +26,6 @@
     </div>
     <br />
     <asp:Button CssClass="btn btn-outline-success" ID="btnDefault" runat="server" Text="返回預設頁" OnClick="btnDefault_Click"/> &nbsp &nbsp
+    <asp:Button CssClass="btn btn-warning" ID="btnCreate" runat="server" Text="新增問卷管理帳號" OnClick="btnCreate_Click"/> &nbsp &nbsp
     <br /><br />
 </asp:Content>

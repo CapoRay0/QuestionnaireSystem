@@ -70,6 +70,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CreateSystemInfo.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="ExternalTools\css\bootstrap-grid.css" />
     <Content Include="ExternalTools\css\bootstrap-grid.min.css" />
@@ -112,6 +113,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateSystemInfo.aspx.cs">
+      <DependentUpon>CreateSystemInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CreateSystemInfo.aspx.designer.cs">
+      <DependentUpon>CreateSystemInfo.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
