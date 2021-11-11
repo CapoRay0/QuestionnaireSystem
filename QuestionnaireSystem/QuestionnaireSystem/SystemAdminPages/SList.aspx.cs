@@ -32,10 +32,13 @@ namespace QuestionnaireSystem.SystemAdminPages
             {
                 if (dt.Rows[i]["EndDate"].ToString() != "")
                 {
+                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
                     DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
                     DateTime timeNow = DateTime.Now;
                     int quesIDToClose = Convert.ToInt32(dt.Rows[i][0].ToString()); //找到對應的流水號
                     if ((timeNow - dbEnd).Days > 0)
+                        QuestionnaireData.CloseQuesStateByTime(quesIDToClose);
+                    if ((timeNow - dbStart).Days < 0)
                         QuestionnaireData.CloseQuesStateByTime(quesIDToClose);
                 }
             }

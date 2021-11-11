@@ -282,6 +282,10 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataFormatTransfer\DataFormatTransfer.csproj">
+      <Project>{bb527694-65a5-45cf-bf7b-680172c79032}</Project>
+      <Name>DataFormatTransfer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DBSource\DBSource.csproj">
       <Project>{1E6ECD08-A235-4068-8847-1EF46265099C}</Project>
       <Name>DBSource</Name>

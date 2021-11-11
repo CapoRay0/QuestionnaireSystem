@@ -304,6 +304,43 @@ namespace DBSource
         }
 
         #endregion
-        
+
+        /// <summary>
+        /// 從資料庫取得要匯出的 DataTable
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <returns></returns>
+        public static DataTable OutputToCSV(Guid QuesGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [User].[Name] AS 姓名
+                         ,[User].[Phone] AS 電話
+	                     ,[User].[Email] AS Email
+	                     ,[User].[Age] AS 年齡
+	                     ,[Ques].[Caption] AS 問卷名稱
+	                     ,[Prob].[Text] AS 問題
+	                     ,[Prob].[Selection] AS 問題選項
+	                     ,[Ans].[AnswerText] AS 回答
+	                     ,[User].CreateDate AS 填寫時間
+                   FROM [Questionnaire] AS [Ques]
+                     JOIN [ReplyInfo] AS [User] ON [Ques].QuesGuid = [User].QuesGuid
+                     JOIN [Reply] AS [Ans] ON [User].UserGuid = [Ans].UserGuid
+                     JOIN [Problem] AS [Prob] ON [Ans].ProbGuid = [Prob].ProbGuid
+                   WHERE [Ques].QuesGuid = @quesGuid
+                ";
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@quesGuid", QuesGuid));
+            try
+            {
+                return DBHelper.ReadDataTable(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+
     }
 }

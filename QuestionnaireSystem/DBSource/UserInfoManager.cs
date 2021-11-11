@@ -10,6 +10,8 @@ namespace DBSource
 {
     public class UserInfoManager
     {
+        #region 前端登入
+
         /// <summary>
         /// 透過帳號來取得使用者資訊
         /// </summary>
@@ -174,6 +176,10 @@ namespace DBSource
             }
         }
 
+        #endregion
+
+        #region 答題人
+
         /// <summary>
         /// 檢查同一問卷中手機是否重複
         /// </summary>
@@ -255,5 +261,41 @@ namespace DBSource
                 return false;
             }
         }
+
+        /// <summary>
+        /// 列出使用者作答內容(填寫資料頁)
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        /// <returns></returns>
+        public static DataTable GetReplyInfo(Guid QuesGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [UserGuid]
+                        , [QuesGuid]
+                        , [Name]
+                        , [Phone]
+                        , [Email]
+                        , [Age]
+                        , [CreateDate]
+                    FROM [ReplyInfo]
+                    WHERE [QuesGuid] = @quesGuid
+                    ORDER BY [CreateDate] DESC
+                ";
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@quesGuid", QuesGuid));
+            try
+            {
+                return DBHelper.ReadDataTable(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+
+        #endregion
+
     }
 }

@@ -122,12 +122,12 @@ namespace QuestionnaireSystem.GeneralUserPages
 
                 for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每一題
                 {
-                    Guid QuesGuid = Guid.Parse(ProblemDT.Rows[i]["QuesGuid"].ToString());
+                    //Guid QuesGuid = Guid.Parse(ProblemDT.Rows[i]["QuesGuid"].ToString());
                     Guid ProbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
                     int SelectionType = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
 
                     // 新增回答
-                    ReplyData.CreateReply(UserGuid, QuesGuid, answerText[i]);
+                    ReplyData.CreateReply(UserGuid, ProbGuid, answerText[i]);
 
                     // 若單選或複選被打勾，則將統計資料表中對應的 Count + 1
                     if (SelectionType == 0 && !string.IsNullOrWhiteSpace(answerText[i]))

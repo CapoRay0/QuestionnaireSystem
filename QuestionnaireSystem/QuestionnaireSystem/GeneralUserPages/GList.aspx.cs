@@ -18,6 +18,23 @@ namespace QuestionnaireSystem.GeneralUserPages
             Session.Abandon(); // 清空所有 Session
 
             dt = QuestionnaireData.GetQuestionnaire();
+
+            // 取得現在時間來判斷是否關閉問卷
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (dt.Rows[i]["EndDate"].ToString() != "")
+                {
+                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+                    DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                    DateTime timeNow = DateTime.Now;
+                    int quesIDToClose = Convert.ToInt32(dt.Rows[i][0].ToString()); //找到對應的流水號
+                    if ((timeNow - dbEnd).Days > 0)
+                        QuestionnaireData.CloseQuesStateByTime(quesIDToClose);
+                    if ((timeNow - dbStart).Days < 0)
+                        QuestionnaireData.CloseQuesStateByTime(quesIDToClose);
+                }
+            }
+
             var dtPaged = this.GetPagedDataTable(dt);
 
             if (dt.Rows.Count == 0)

@@ -114,6 +114,62 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 取該問題中所有選項 >> 需要["Count"]
+        /// </summary>
+        /// <param name="ProbGuid"></param>
+        /// <returns></returns>
+        public static DataTable GetStatic(Guid ProbGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [StaticID]
+                        , [QuesGuid]
+                        , [ProbGuid]
+                        , [OptionText]
+                        , [Count]
+                    FROM [Static]
+                    WHERE [ProbGuid] = @probGuid
+                ";
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@probGuid", ProbGuid));
+            try
+            {
+                return DBHelper.ReadDataTable(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 抓出選取總數 ["Sum"]
+        /// </summary>
+        /// <param name="ProbGuid"></param>
+        /// <returns></returns>
+        public static DataRow GetStaticSum(Guid ProbGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT SUM([Count]) AS [Sum]
+                    FROM [Static]
+                    WHERE [ProbGuid] = @probGuid
+                ";
+
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@probGuid", ProbGuid));
+            try
+            {
+                return DBHelper.ReadDataRow(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
         #endregion
     }
 }

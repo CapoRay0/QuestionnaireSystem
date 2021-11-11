@@ -250,7 +250,13 @@ namespace QuestionnaireSystem.SystemAdminPages
         {
             DataTable SessionToDB;
 
-            SessionToDB = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+            if (Session["CommonDT"] == null)
+            {
+                Response.Write($"<Script language='JavaScript'>alert('好像什麼都沒變哦~'); location.href='Common.aspx'; </Script>");
+                return;
+            }
+            else
+                SessionToDB = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
 
             // 先刪除後加入
             CommonProblem.DeleteCommonData();

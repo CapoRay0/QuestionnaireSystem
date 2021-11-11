@@ -25,7 +25,7 @@
     <br />
     
     <asp:Literal ID="ltlMsg" runat="server"></asp:Literal>
-    <asp:GridView class="table table-condensed" ID="gvGList" AlternatingRowStyle-Wrap="false" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvGList_RowDataBound">
+    <asp:GridView class="table table-condensed" ID="gvGList" runat="server" AlternatingRowStyle-Wrap="False" AutoGenerateColumns="False" OnRowDataBound="gvGList_RowDataBound">
         <Columns>
             <asp:BoundField DataField="QuesID" HeaderText="#" />
             <asp:TemplateField HeaderText="問卷">

@@ -2,7 +2,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <br /><br />
+    <br />
     <div>
     <asp:Label CssClass="col-form-label-lg" ID="lblName" runat="server" Text="請輸入名字"></asp:Label>
     <asp:TextBox CssClass="form-control" ID="txtName" runat="server" placeholder="您的名字"></asp:TextBox><br />

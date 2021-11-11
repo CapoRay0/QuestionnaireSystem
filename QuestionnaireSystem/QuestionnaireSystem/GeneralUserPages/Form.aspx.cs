@@ -127,7 +127,7 @@ namespace QuestionnaireSystem.GeneralUserPages
                         return;
                     }
 
-                    reply += inpValue; // 取回答值
+                    reply += inpValue; // 取每題的回答值
 
                     // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等
                     if (i < ProblemDT.Rows.Count - 1) // 最後一題才不加分號

@@ -28,7 +28,7 @@
     <asp:ImageButton ID="btnNewForm" runat="server" ImageUrl="../Images/plus.png" width="30" height="30" OnClick="btnNewForm_Click" />
 
     <asp:Literal ID="ltlMsg" runat="server"></asp:Literal>
-    <asp:GridView class="table table-condensed" ID="gvSList" AlternatingRowStyle-Wrap="false" runat="server" AutoGenerateColumns="False" OnRowDataBound="gvSlist_RowDataBound">
+    <asp:GridView class="table table-condensed" ID="gvSList" runat="server" AlternatingRowStyle-Wrap="False" AutoGenerateColumns="False" OnRowDataBound="gvSlist_RowDataBound">
         <Columns>
             <asp:TemplateField>
                 <ItemTemplate>
@@ -56,7 +56,7 @@
 
             <asp:TemplateField HeaderText="觀看統計">
                 <ItemTemplate>
-                    <a href="SStastic.aspx?ID=<%# Eval("QuesGuid") %>">前往</a>
+                    <a href="Detail.aspx?ID=<%# Eval("QuesGuid") %>#tabs4">前往</a>
                 </ItemTemplate>
             </asp:TemplateField>
         </Columns>

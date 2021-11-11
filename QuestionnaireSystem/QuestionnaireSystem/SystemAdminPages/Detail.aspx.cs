@@ -1,4 +1,5 @@
 ﻿using DBSource;
+using DataFormatTransfer;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -36,7 +37,7 @@ namespace QuestionnaireSystem.SystemAdminPages
 
                     Guid idToGuid = Guid.Parse(id);
 
-                    #region 問卷部分
+                    #region 問卷
                     DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid); // 從 DB 抓問卷
 
                     //先判斷 QuesGuid 是否有誤
@@ -65,7 +66,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                         this.chkStatic.Checked = false;
                     #endregion
 
-                    #region 問題部分
+                    #region 問題
                     DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 從 DB 抓問題
 
                     if (Session["ProblemDT"] == null)
@@ -129,6 +130,105 @@ namespace QuestionnaireSystem.SystemAdminPages
                                 this.ckbIsMust.Checked = (bool)OneProblem["IsMust"];
                             }
                         }
+                    }
+                    #endregion
+
+                    #region 填寫資料
+                    DataTable ReplyDT = UserInfoManager.GetReplyInfo(idToGuid);
+                    if (ReplyDT.Rows.Count > 0)
+                    {
+                        this.btnOutput.Enabled = true;
+                        this.gvReply.DataSource = ReplyDT;
+                        this.gvReply.DataBind();
+                    }
+
+                    if (this.Request.QueryString["UID"] != null)
+                    {
+                        this.gvReply.Visible = false;
+                        string uid = this.Request.QueryString["UID"];
+                        Guid uidToGuid = Guid.Parse(uid);
+                        DataRow ReplyInfoDataRow = ReplyData.GetReplyInfoDataRow(uidToGuid);
+
+                        if (ReplyInfoDataRow != null)
+                        {
+                            this.lblName.Visible = true;
+                            this.txtName.Visible = true;
+                            this.txtName.Text = ReplyInfoDataRow["Name"].ToString();
+
+                            this.lblPhone.Visible = true;
+                            this.txtPhone.Visible = true;
+                            this.txtPhone.Text = ReplyInfoDataRow["Phone"].ToString();
+
+                            this.lblEmail.Visible = true;
+                            this.txtEmail.Visible = true;
+                            this.txtEmail.Text = ReplyInfoDataRow["Email"].ToString();
+
+                            this.lblAge.Visible = true;
+                            this.txtAge.Visible = true;
+                            this.txtAge.Text = ReplyInfoDataRow["Age"].ToString();
+
+                            this.lblFillOut.Visible = true;
+                            this.lblCreateDate.Visible = true;
+                            this.lblCreateDate.Text = ReplyInfoDataRow["CreateDate"].ToString();
+
+                            //使用 PlaceHolder 新增控制項：https://codertw.com/%E5%89%8D%E7%AB%AF%E9%96%8B%E7%99%BC/210860/
+
+                            for (int i = 0; i < ProblemDT.Rows.Count; i++) // 迴圈印出所有問題與回答
+                            {
+                                Literal ltlProbText = new Literal();
+                                ltlProbText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString() + "<br />";
+                                phReply.Controls.Add(ltlProbText); // 印出問題名
+
+                                Literal ltlProbAnswer = new Literal();
+                                Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+                                DataRow AnsDR = ReplyData.GetReplyDataRow(uidToGuid, pbGuid);
+
+                                ltlProbAnswer.Text = "&nbsp &nbsp " + AnsDR["AnswerText"].ToString() + "<br /><br />";
+                                phReply.Controls.Add(ltlProbAnswer); // 印出回答
+                            }
+
+                            this.btnBackToReplyInfo.Visible = true;
+                        }
+                    }
+                    #endregion
+
+                    #region 統計
+                    for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每個問題
+                    {
+                        Literal ltlStaticText = new Literal();
+                        ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString() + "<br />";
+                        phStatic.Controls.Add(ltlStaticText); // 印出欲統計問題名
+
+                        int type = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
+                        if (type == 0 || type == 1) // 單選、複選
+                        {
+                            Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+
+                            DataTable option = StaticData.GetStatic(pbGuid); // 該問題單一選項 (分子)
+
+                            DataRow sumDR = StaticData.GetStaticSum(pbGuid); // 該問題選擇數加總 (分母)
+                            int sum = Convert.ToInt32(sumDR["Sum"]);
+
+                            for (int j = 0; j < option.Rows.Count; j++)
+                            {
+                                int count = Convert.ToInt32(option.Rows[j]["Count"]);
+                                string probtext = option.Rows[j]["OptionText"].ToString();
+                                
+                                double percent = 0;
+                                string percentStr = "0";
+                                if(sum != 0)
+                                {
+                                    percent = ((double)count / (double)sum) * 100; // 轉成 double 型別後再運算
+                                    percentStr = percent.ToString("0.00"); // 保留小數點後2位
+                                }
+                                ltlStaticText.Text += "&nbsp &nbsp " + $"{probtext} {percentStr}% ({count})<br />";
+                            }
+                        }
+                        else
+                            ltlStaticText.Text += "&nbsp &nbsp -";
+                        
+                        ltlStaticText.Text += "<br />";
+                        phStatic.Controls.Add(ltlStaticText);
                     }
                     #endregion
                 }
@@ -257,7 +357,7 @@ namespace QuestionnaireSystem.SystemAdminPages
         protected void lkbCommon_Click(object sender, EventArgs e)
         {
             int commonID;
-            if(int.TryParse(this.ddlCommon.SelectedValue, out commonID))
+            if (int.TryParse(this.ddlCommon.SelectedValue, out commonID))
             {
                 DataRow commRow = CommonProblem.GetCommonByCommID(commonID);
 
@@ -503,6 +603,9 @@ namespace QuestionnaireSystem.SystemAdminPages
             ProblemData.DeleteProblemData(idToGuid);
 
             int Count = 0;
+
+            StaticData.DeleteStaticData(idToGuid); // *先刪除統計資料
+
             for (int i = 0; i < SessionToDB.Rows.Count; i++)
             {
                 SessionToDB.Rows[i]["Count"] = i + 1;
@@ -512,8 +615,6 @@ namespace QuestionnaireSystem.SystemAdminPages
                 string Text = (string)SessionToDB.Rows[i]["Text"];
                 int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
                 bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
-
-                StaticData.DeleteStaticData(QuesGuid); // *先刪除統計資料
 
                 string Selection = "";
                 if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
@@ -528,9 +629,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                         StaticData.CreateStaticData(QuesGuid, ProbGuid, OptionText[j], StaticCount); // *後新增出來
                     }
                 }
-
-
-                ProblemData.CreateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection);
+                ProblemData.CreateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection); // 將 Session 寫進資料庫
             }
 
             ProblemData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
@@ -549,8 +648,89 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         #endregion
 
-        //---------------------------------------------------------填寫資料-----------------------------------------------------------
+        #region 填寫資料
 
-        //----------------------------------------------------------統計------------------------------------------------------------
+        /// <summary>
+        /// 內建分頁
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void gvReply_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvReply.PageIndex = e.NewPageIndex;
+            string id = this.Request.QueryString["ID"];
+            Guid idToGuid = Guid.Parse(id);
+            DataTable ReplyDT = UserInfoManager.GetReplyInfo(idToGuid);
+            this.gvReply.DataSource = ReplyDT;
+            this.gvReply.DataBind();
+        }
+
+        /// <summary>
+        /// 編號以倒序方式顯示
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void gvReply_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+
+            string id = this.Request.QueryString["ID"];
+            Guid idToGuid = Guid.Parse(id);
+            DataTable ReplyDT = UserInfoManager.GetReplyInfo(idToGuid);
+            int count = ReplyDT.Rows.Count;
+            var row = e.Row;
+            if (row.RowType == DataControlRowType.DataRow)
+            {
+                Label lbl = row.FindControl("lblReplyCount") as Label;
+                int replyCount = gvReply.Rows.Count;
+                lbl.Text = (count - replyCount).ToString();
+
+            }
+        }
+
+        /// <summary>
+        /// 返回使用者作答列表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnBackToReplyInfo_Click(object sender, EventArgs e)
+        {
+            string id = this.Request.QueryString["ID"];
+            Response.Redirect($"/SystemAdminPages/Detail.aspx?ID={id}#tabs3");
+        }
+
+        /// <summary>
+        /// 匯出.csv檔案
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnOutput_Click(object sender, EventArgs e)
+        {
+            Guid idToGuid = Guid.Parse(this.Request.QueryString["ID"]);
+            DataTable dt = QuestionnaireData.OutputToCSV(idToGuid);
+
+            //取得機器+user name
+            var loginAccount = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //取得機器名
+            var machineName = Environment.MachineName;
+            //讓loginAccount減去機器名
+            loginAccount = loginAccount.Remove(0, machineName.Length + 1);
+            string now = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+
+            string outputPath = $@"C:\Users\{loginAccount}\Downloads\使用者作答{now}.csv";
+
+            //if (ExcelDataManager.DataTableToExcel(dt, outputPath))
+            if (ExcelDataManager.DataTableToCsv(dt, outputPath))
+            {
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('報表轉換成功!')</script>");
+            }
+            else
+            {
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('報表轉換失敗!')</script>");
+            }
+        }
+
+        #endregion
+
+
     }
 }

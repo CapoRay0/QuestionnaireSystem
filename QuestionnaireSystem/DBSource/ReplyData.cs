@@ -101,26 +101,26 @@ namespace DBSource
         /// <param name="UserGuid"></param>
         /// <param name="QuesGuid"></param>
         /// <param name="AnswerText"></param>
-        public static void CreateReply(Guid UserGuid, Guid QuesGuid, string AnswerText)
+        public static void CreateReply(Guid UserGuid, Guid ProbGuid, string AnswerText)
         {
             string connStr = DBHelper.GetConnectionString();
             string dbCommand =
                 $@" INSERT INTO [Reply]
                     (
                           [UserGuid]
-                        , [QuesGuid]
+                        , [ProbGuid]
                         , [AnswerText]
                     )
                     VALUES
                     (
                         @userGuid
-                       ,@quesGuid
+                       ,@probGuid
                        ,@answerText
                     )
                 ";
             List<SqlParameter> paramList = new List<SqlParameter>();
             paramList.Add(new SqlParameter("@userGuid", UserGuid));
-            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+            paramList.Add(new SqlParameter("@probGuid", ProbGuid));
             paramList.Add(new SqlParameter("@answerText", AnswerText));
 
             try
@@ -130,6 +130,33 @@ namespace DBSource
             catch (Exception ex)
             {
                 logger.WriteLog(ex);
+            }
+        }
+
+
+        public static DataRow GetReplyDataRow(Guid UserGuid, Guid ProbGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@"SELECT [ReplyID]
+                        , [UserGuid]
+                        , [ProbGuid]
+                        , [AnswerText]
+                    FROM [Reply]
+                    WHERE [UserGuid] = @userGuid AND [ProbGuid] = @probGuid
+                ";
+
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.Add(new SqlParameter("@userGuid", UserGuid));
+            list.Add(new SqlParameter("@probGuid", ProbGuid));
+            try
+            {
+                return DBHelper.ReadDataRow(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
             }
         }
 

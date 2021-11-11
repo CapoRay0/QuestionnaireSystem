@@ -43,6 +43,12 @@ namespace DBSource
             throw ex;
         }
 
+        /// <summary>
+        /// 回傳指定路徑上n層的絕對路徑
+        /// </summary>
+        /// <param name="path">指定路徑</param>
+        /// <param name="upLevel">上n層</param>
+        /// <returns></returns>
         public static string GetUpLevelDirectory(string path, int upLevel)
         {
             var directory = File.GetAttributes(path).HasFlag(FileAttributes.Directory)
