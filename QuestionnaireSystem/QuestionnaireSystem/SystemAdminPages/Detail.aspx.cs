@@ -116,7 +116,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                                 }
                             }
                         }
-                        else // 進頁面後直接修改 DB (只會跑第一次)
+                        else // 從資料庫抓值
                         {
                             Guid PbGuid = Guid.Parse(Session["PbGuid"].ToString());
                             DataRow OneProblem = ProblemData.GetProblemDataRow(PbGuid);
