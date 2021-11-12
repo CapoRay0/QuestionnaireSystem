@@ -11,12 +11,23 @@ namespace DBSource
 {
     public class DBHelper
     {
+        /// <summary>
+        /// 取得連線字串
+        /// </summary>
+        /// <returns></returns>
         public static string GetConnectionString()
         {
             string val = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;
             return val;
         }
 
+        /// <summary>
+        /// 讀取 DataTable
+        /// </summary>
+        /// <param name="connStr"></param>
+        /// <param name="dbCommand"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static DataTable ReadDataTable(string connStr, string dbCommand, List<SqlParameter> list)
         {
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -36,6 +47,13 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        ///  讀取 DataRow
+        /// </summary>
+        /// <param name="connStr"></param>
+        /// <param name="dbCommand"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static DataRow ReadDataRow(string connStr, string dbCommand, List<SqlParameter> list)
         {
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -60,6 +78,13 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 修改資料
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="dbCommandString"></param>
+        /// <param name="paramList"></param>
+        /// <returns></returns>
         public static int ModifyData(string connectionString, string dbCommandString, List<SqlParameter> paramList)
         {
             // connect db & execute
@@ -76,6 +101,12 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 新增資料
+        /// </summary>
+        /// <param name="connStr"></param>
+        /// <param name="dbCommand"></param>
+        /// <param name="paramList"></param>
         public static void CreatData(string connStr, string dbCommand, List<SqlParameter> paramList)
         {
             // connect db & execute

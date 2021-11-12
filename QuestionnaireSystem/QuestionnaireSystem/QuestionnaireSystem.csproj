@@ -47,6 +47,7 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.DataVisualization" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -99,7 +100,7 @@
     <Content Include="GeneralUserPages\Confirm.aspx" />
     <Content Include="GeneralUserPages\Form.aspx" />
     <Content Include="GeneralUserPages\GList.aspx" />
-    <Content Include="GeneralUserPages\GStastic.aspx" />
+    <Content Include="GeneralUserPages\GStatic.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\form.png" />
     <Content Include="Images\plus.png" />
@@ -127,7 +128,7 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="DrawingVerification.ashx.cs">
+    <Compile Include="Handlers\DrawingVerification.ashx.cs">
       <DependentUpon>DrawingVerification.ashx</DependentUpon>
     </Compile>
     <Compile Include="ForgotPWD.aspx.cs">
@@ -158,12 +159,12 @@
     <Compile Include="GeneralUserPages\GList.aspx.designer.cs">
       <DependentUpon>GList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="GeneralUserPages\GStastic.aspx.cs">
-      <DependentUpon>GStastic.aspx</DependentUpon>
+    <Compile Include="GeneralUserPages\GStatic.aspx.cs">
+      <DependentUpon>GStatic.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="GeneralUserPages\GStastic.aspx.designer.cs">
-      <DependentUpon>GStastic.aspx</DependentUpon>
+    <Compile Include="GeneralUserPages\GStatic.aspx.designer.cs">
+      <DependentUpon>GStatic.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -267,7 +268,7 @@
     <Content Include="ExternalTools\js\bootstrap.js.map" />
     <Content Include="ExternalTools\js\bootstrap.min.js.map" />
     <Content Include="MasterPages\GeneralUser.Master" />
-    <Content Include="DrawingVerification.ashx" />
+    <Content Include="Handlers\DrawingVerification.ashx" />
     <Content Include="Handlers\ProblemHandler.ashx" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">

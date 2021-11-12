@@ -35,10 +35,8 @@ namespace QuestionnaireSystem.SystemAdminPages
                     // 用 LinkButton 才可處理 PostBack 問題
                     this.lkbCommon.PostBackUrl = $"/SystemAdminPages/Detail.aspx?ID={id}#tabs2";
 
-                    Guid idToGuid = Guid.Parse(id);
-
                     #region 問卷
-                    DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid); // 從 DB 抓問卷
+                    DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id)); // 從 DB 抓問卷
 
                     //先判斷 QuesGuid 是否有誤
                     if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
@@ -67,7 +65,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                     #endregion
 
                     #region 問題
-                    DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 從 DB 抓問題
+                    DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
 
                     if (Session["ProblemDT"] == null)
                     {
@@ -134,7 +132,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                     #endregion
 
                     #region 填寫資料
-                    DataTable ReplyDT = UserInfoManager.GetReplyInfo(idToGuid);
+                    DataTable ReplyDT = UserInfoManager.GetReplyInfo(Guid.Parse(id));
                     if (ReplyDT.Rows.Count > 0)
                     {
                         this.btnOutput.Enabled = true;
@@ -145,9 +143,8 @@ namespace QuestionnaireSystem.SystemAdminPages
                     if (this.Request.QueryString["UID"] != null)
                     {
                         this.gvReply.Visible = false;
-                        string uid = this.Request.QueryString["UID"];
-                        Guid uidToGuid = Guid.Parse(uid);
-                        DataRow ReplyInfoDataRow = ReplyData.GetReplyInfoDataRow(uidToGuid);
+                        string Uid = this.Request.QueryString["UID"];
+                        DataRow ReplyInfoDataRow = ReplyData.GetReplyInfoDataRow(Guid.Parse(Uid));
 
                         if (ReplyInfoDataRow != null)
                         {
@@ -181,7 +178,7 @@ namespace QuestionnaireSystem.SystemAdminPages
 
                                 Literal ltlProbAnswer = new Literal();
                                 Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
-                                DataRow AnsDR = ReplyData.GetReplyDataRow(uidToGuid, pbGuid);
+                                DataRow AnsDR = ReplyData.GetReplyDataRow(Guid.Parse(Uid), pbGuid);
 
                                 ltlProbAnswer.Text = "&nbsp &nbsp " + AnsDR["AnswerText"].ToString() + "<br /><br />";
                                 phReply.Controls.Add(ltlProbAnswer); // 印出回答
@@ -196,7 +193,11 @@ namespace QuestionnaireSystem.SystemAdminPages
                     for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每個問題
                     {
                         Literal ltlStaticText = new Literal();
-                        ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString() + "<br />";
+                        ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString();
+                        if((bool)ProblemDT.Rows[i]["IsMust"] == true)
+                            ltlStaticText.Text += " (必填)";
+                        ltlStaticText.Text += "<br />";
+
                         phStatic.Controls.Add(ltlStaticText); // 印出欲統計問題名
 
                         int type = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
@@ -225,7 +226,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                             }
                         }
                         else
-                            ltlStaticText.Text += "&nbsp &nbsp -";
+                            ltlStaticText.Text += "&nbsp &nbsp -<br />";
                         
                         ltlStaticText.Text += "<br />";
                         phStatic.Controls.Add(ltlStaticText);
@@ -721,7 +722,7 @@ namespace QuestionnaireSystem.SystemAdminPages
             //if (ExcelDataManager.DataTableToExcel(dt, outputPath))
             if (ExcelDataManager.DataTableToCsv(dt, outputPath))
             {
-                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('報表轉換成功!')</script>");
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('報表轉換成功，請至本機下載查看!! ')</script>");
             }
             else
             {

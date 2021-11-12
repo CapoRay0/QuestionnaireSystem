@@ -52,7 +52,7 @@
 
             <asp:TemplateField HeaderText="觀看統計">
                 <ItemTemplate>
-                    <a href="GStastic.aspx?ID=<%# Eval("QuesGuid") %>">前往</a>
+                    <a href="GStatic.aspx?ID=<%# Eval("QuesGuid") %>">前往</a>
                 </ItemTemplate>
             </asp:TemplateField>
         </Columns>

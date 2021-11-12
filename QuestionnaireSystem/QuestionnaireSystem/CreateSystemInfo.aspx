@@ -4,8 +4,8 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <br />
     <div>
-    <asp:Label CssClass="col-form-label-lg" ID="lblName" runat="server" Text="請輸入名字"></asp:Label>
-    <asp:TextBox CssClass="form-control" ID="txtName" runat="server" placeholder="您的名字"></asp:TextBox><br />
+    <asp:Label CssClass="col-form-label-lg" ID="lblName" runat="server" Text="請輸入姓名"></asp:Label>
+    <asp:TextBox CssClass="form-control" ID="txtName" runat="server" placeholder="您的姓名"></asp:TextBox><br />
 
     <asp:Label CssClass="col-form-label-lg" ID="lblPhone" runat="server" Text="請輸入手機號碼"></asp:Label>
     <asp:TextBox CssClass="form-control" ID="txtPhone" runat="server" placeholder="您的手機號碼" TextMode="Phone"></asp:TextBox><br />

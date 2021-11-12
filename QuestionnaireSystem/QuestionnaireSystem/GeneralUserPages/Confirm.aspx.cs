@@ -21,9 +21,8 @@ namespace QuestionnaireSystem.GeneralUserPages
                 return;
             }
 
-            Guid idToGuid = Guid.Parse(id);
-            DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid);  // 問卷
-            DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 問題
+            DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id));  // 問卷
+            DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 問題
 
             if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
             {
@@ -75,7 +74,7 @@ namespace QuestionnaireSystem.GeneralUserPages
                 {
                     string[] reply = Session["Reply"].ToString().Split(';');
                     for (int i = 0; i < ProblemDT.Rows.Count; i++)
-                        this.ltlReply.Text += $"<p>{i + 1}. {ProblemDT.Rows[i]["Text"]} <br /> &nbsp &nbsp {reply[i]}</p><br />";
+                        this.ltlReply.Text += $"<p>{i + 1}. {ProblemDT.Rows[i]["Text"]} <br /> &nbsp &nbsp {reply[i]}</p><br />"; // 印出作答的內容以供確認
                 }
             }
         }
@@ -118,7 +117,7 @@ namespace QuestionnaireSystem.GeneralUserPages
 
             if (Session["Reply"] != null)
             {
-                string[] answerText = Session["Reply"].ToString().Split(';');
+                string[] answerText = Session["Reply"].ToString().Split(';'); // 取出以分號分割的回答
 
                 for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每一題
                 {
@@ -132,18 +131,18 @@ namespace QuestionnaireSystem.GeneralUserPages
                     // 若單選或複選被打勾，則將統計資料表中對應的 Count + 1
                     if (SelectionType == 0 && !string.IsNullOrWhiteSpace(answerText[i]))
                     {
-                        StaticData.UpdateStaticCount(ProbGuid, answerText[i]); // 單選
+                        StaticData.UpdateStaticCount(ProbGuid, answerText[i]); // 單選統計 + 1
                     }
 
                     if (SelectionType == 1 && !string.IsNullOrWhiteSpace(answerText[i]))
                     {
-                        string[] checkBoxAns = answerText[i].Split(','); // 複選中再以逗號分割
+                        string[] checkBoxAns = answerText[i].Split(','); // 再取出以逗號分割的值
                         for (int j = 0; j < checkBoxAns.Length; j++)
-                            StaticData.UpdateStaticCount(ProbGuid, checkBoxAns[j]);
+                            StaticData.UpdateStaticCount(ProbGuid, checkBoxAns[j]); // 複選統計 + 1
                     }
                 }
             }
-            Response.Write($"<Script language='JavaScript'>alert('問卷已送出，感謝您的填寫!!'); location.href='GStastic.aspx?ID={id}'; </Script>");
+            Response.Write($"<Script language='JavaScript'>alert('問卷已送出，感謝您的填寫!!'); location.href='GStatic.aspx?ID={id}'; </Script>");
             return;
         }
     }

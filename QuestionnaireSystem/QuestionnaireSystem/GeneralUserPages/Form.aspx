@@ -52,7 +52,7 @@
                                 var optionStr = obj.Selection.split(';'); // 字串分割
                                 for (var j = 0; j < optionStr.length; j++) // 題目選項
                                     htmlText += `&nbsp&nbsp&nbsp&nbsp<input type="radio" id="${i}" name="${obj.ProbGuid}" value=${optionStr[j]} /> ${optionStr[j]}<br />`;
-                                // 相同題目中選項的 name 必須相同
+                                // 相同題目中選項的 name 必須相同 >> 用 Request.Form 接收 name = ProbGuid 的參數
                                 break;
                             case 1: // 複選方塊 (回答之間會自動以逗號分割)
                                 var optionStr = obj.Selection.split(';');
@@ -158,7 +158,7 @@
         </tr>
     </table>
 
-    <div id="Question"></div>
+    <div id="Question"></div> <%--這裡的 div 動態新增問卷--%>
 
     <br />
     <table width="100%">

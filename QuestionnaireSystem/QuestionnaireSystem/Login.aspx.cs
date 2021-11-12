@@ -15,8 +15,8 @@ namespace QuestionnaireSystem
             if (!Page.IsPostBack)//判斷頁面是不是第一次顯示
             {
                 Session.RemoveAll();
-                txtAccount.Text = "";
-                txtPWD.Text = "";
+                this.txtAccount.Text = "";
+                this.txtPWD.Text = "";
             }
         }
 
@@ -39,15 +39,15 @@ namespace QuestionnaireSystem
             }
 
             //驗證驗證碼
-            //#region 開發時隱藏
+            #region 開發時隱藏
 
-            //if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
-            //{
-            //    this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
-            //    return;
-            //}
+            if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
+            {
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
+                return;
+            }
 
-            //#endregion
+            #endregion
 
 
             //如果帳號=密碼就是第一次登入，導向到更改密碼頁
@@ -57,7 +57,7 @@ namespace QuestionnaireSystem
             }
 
             //如果閒置10分鐘則強制登出
-            Session.Timeout = 10;
+            //Session.Timeout = 10;
 
             //登入成功，根據使用者等級導向至不同頁面
             

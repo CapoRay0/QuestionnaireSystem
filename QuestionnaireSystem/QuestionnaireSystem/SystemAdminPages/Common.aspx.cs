@@ -88,6 +88,11 @@ namespace QuestionnaireSystem.SystemAdminPages
             }
         }
 
+        /// <summary>
+        /// 新增常用問題
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnAdd_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(this.txtName.Text))
@@ -165,6 +170,11 @@ namespace QuestionnaireSystem.SystemAdminPages
             Response.Redirect(this.Request.RawUrl);
         }
 
+        /// <summary>
+        /// GridView 呈現方式
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void gvComm_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             var row = e.Row;
@@ -197,6 +207,11 @@ namespace QuestionnaireSystem.SystemAdminPages
             }
         }
 
+        /// <summary>
+        /// 刪除常用問題
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnDelete_Click(object sender, ImageClickEventArgs e)
         {
             DataTable DTforDelete = new DataTable();
@@ -230,6 +245,11 @@ namespace QuestionnaireSystem.SystemAdminPages
             Response.Redirect(this.Request.RawUrl);
         }
 
+        /// <summary>
+        /// 編輯常用問題
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void gvComm_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             if (e.CommandName == "CommEdit")
@@ -240,12 +260,22 @@ namespace QuestionnaireSystem.SystemAdminPages
             }
         }
 
+        /// <summary>
+        /// 取消常用問題管理，回到列表頁
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnCancelP_Click(object sender, EventArgs e)
         {
             Response.Redirect("/SystemAdminPages/SList.aspx"); // Session 將於列表頁進行 Abandon
             return;
         }
 
+        /// <summary>
+        /// 送出變更，將 Session 寫進資料庫
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnSendP_Click(object sender, EventArgs e)
         {
             DataTable SessionToDB;

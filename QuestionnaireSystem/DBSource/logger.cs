@@ -14,6 +14,9 @@ namespace DBSource
         //Exception ex = new NullReferenceException();
         //logger.WriteLog(ex);
 
+        /// <summary>
+        /// 指定路徑
+        /// </summary>
         public static string logPath
         {
             get{
@@ -22,6 +25,11 @@ namespace DBSource
                 return thisFilePathFather;
             }
         }
+
+        /// <summary>
+        /// 將錯誤內容寫到 DBSource\Logs\Log.log 之中
+        /// </summary>
+        /// <param name="ex"></param>
         public static void WriteLog(Exception ex)
         {
             string msg =

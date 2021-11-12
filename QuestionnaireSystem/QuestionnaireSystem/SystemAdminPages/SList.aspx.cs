@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -15,15 +16,19 @@ namespace QuestionnaireSystem.SystemAdminPages
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Session.Abandon(); // 清空所有 Session
+            //Session.Abandon(); // 需用 Session 檢查登入
+            Session["ProblemDT"] = null;
+            Session["PbGuid"] = null;
+            Session["CommonDT"] = null;
+            Session["CommID"] = null;
 
-            //#region 開發時隱藏
-            //if (!AuthManager.IsLogined())
-            //{
-            //    Response.Redirect("../Login.aspx");
-            //    return;
-            //}
-            //#endregion
+            #region 開發時隱藏
+            if (!AuthManager.IsLogined())
+            {
+                Response.Redirect("../Login.aspx");
+                return;
+            }
+            #endregion
 
             dt = QuestionnaireData.GetQuestionnaire();
 
@@ -121,15 +126,20 @@ namespace QuestionnaireSystem.SystemAdminPages
                 CheckBox cb = (CheckBox)gvSList.Rows[i].FindControl("ckbDelete");
                 if (cb.Checked == true)
                 {
-                    int quesIDToDelete = Convert.ToInt32(gvSList.Rows[i].Cells[1].Text);
-                    QuestionnaireData.DeleteQuestionnaireData(quesIDToDelete); // 刪除問卷
-                    DataRow QuesDataRow = QuestionnaireData.GetQuesIDForDeleteProblem(quesIDToDelete);
+                    int quesID = Convert.ToInt32(gvSList.Rows[i].Cells[1].Text);
+                    
+                    DataRow QuesDataRow = QuestionnaireData.GetQuesIDForDeleteProblem(quesID);
                     if(QuesDataRow != null)
                     {
                         string QuesStr = QuesDataRow[0].ToString();
                         Guid QuesGuid = Guid.Parse(QuesStr); // 取得問卷Guid
-                        ProblemData.DeleteProblemData(QuesGuid);// 刪除問卷中的所有問題
+                        ProblemData.DeleteProblemData(QuesGuid); // 刪除問卷中的所有問題
+                        StaticData.DeleteStaticData(QuesGuid); // 刪除透過問題產生出來的統計
                     }
+
+                    Thread.Sleep(1);
+                    QuestionnaireData.DeleteQuestionnaireData(quesID); // 刪除問卷
+
                     Response.Write($"<Script language='JavaScript'>alert('問卷刪除成功!!'); location.href='{this.Request.RawUrl}'; </Script>");
                 }
                 else

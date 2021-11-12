@@ -9,7 +9,7 @@ namespace QuestionnaireSystem.UserControls
 {
     public partial class UcAddControl : System.Web.UI.UserControl
     {
-        // 測試用
+        // 測試
 
         protected void Page_Load(object sender, EventArgs e)
         {

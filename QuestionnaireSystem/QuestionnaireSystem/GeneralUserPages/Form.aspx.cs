@@ -99,8 +99,7 @@ namespace QuestionnaireSystem.GeneralUserPages
             // Request.Form        >> 使用 Post >> 表單送出資料後，從控制項接收參數
 
             string id = this.Request.QueryString["ID"];
-            Guid idToGuid = Guid.Parse(id);
-            DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 從 DB 抓問題
+            DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
 
             string reply = string.Empty; // 裝回答 (以分號分隔)
 
@@ -110,7 +109,7 @@ namespace QuestionnaireSystem.GeneralUserPages
                 // 用 Request.Form 以問題資料表之 ProbGuid 抓取每個控制項的 name >> 回答分割；檢查必填
                 if (string.IsNullOrWhiteSpace(this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()])) // 沒有填 (null / "") 的話那一題就是 null
                 {
-                    if ((bool)ProblemDT.Rows[i]["IsMust"] == true)
+                    if ((bool)ProblemDT.Rows[i]["IsMust"] == true) // 沒填但是必填
                     {
                         Response.Write("<Script language='JavaScript'>alert('必填問題尚未填妥'); </Script>");
                         return;
@@ -120,8 +119,8 @@ namespace QuestionnaireSystem.GeneralUserPages
                 }
                 else
                 {
-                    string inpValue = this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()];
-                    if (inpValue.Contains(";"))
+                    string inpValue = this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()]; // 表單送出資料後，從控制項接收參數
+                    if (inpValue.Contains(";")) // 文字中不能含分號
                     {
                         Response.Write("<Script language='JavaScript'>alert('回答中不能包含分號'); </Script>");
                         return;
@@ -129,9 +128,9 @@ namespace QuestionnaireSystem.GeneralUserPages
 
                     reply += inpValue; // 取每題的回答值
 
-                    // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等
-                    if (i < ProblemDT.Rows.Count - 1) // 最後一題才不加分號
-                        reply += ";";
+                    
+                    if (i < ProblemDT.Rows.Count - 1) // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等 >> 最後一題才不加分號
+                        reply += ";"; // 以 ; 分割每個回答
                 }
             }
 
@@ -152,7 +151,7 @@ namespace QuestionnaireSystem.GeneralUserPages
 
 
 
-            Session["Reply"] = reply; // 全部回答
+            Session["Reply"] = reply; // 全部回答裝進 Session
 
 
 
@@ -169,13 +168,13 @@ namespace QuestionnaireSystem.GeneralUserPages
                 return;
             }
 
-            if (UserInfoManager.CheckPhoneIsRepeat(idToGuid, phone))
+            if (UserInfoManager.CheckPhoneIsRepeat(Guid.Parse(id), phone))
             {
                 Response.Write("<Script language='JavaScript'>alert('不好意思，此問卷中手機已經使用過了'); </Script>");
                 return;
             }
 
-            if (UserInfoManager.CheckEmailIsRepeat(idToGuid, email))
+            if (UserInfoManager.CheckEmailIsRepeat(Guid.Parse(id), email))
             {
                 Response.Write("<Script language='JavaScript'>alert('不好意思，此問卷中Email已經使用過了'); </Script>");
                 return;

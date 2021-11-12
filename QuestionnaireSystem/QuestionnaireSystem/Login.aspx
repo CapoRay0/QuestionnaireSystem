@@ -15,7 +15,7 @@
         <asp:Label CssClass="col-form-label-lg" ID="lblPWD" runat="server" Text="密碼："></asp:Label><br />
         <asp:TextBox CssClass="form-control" ID="txtPWD" runat="server" TextMode="Password" placeholder="在此輸入您的密碼"></asp:TextBox><br />
         <asp:Label CssClass="col-form-label-lg align-bottom" ID="lblVerification" runat="server" Text="驗證碼："></asp:Label>
-        <img class="m-1" src="DrawingVerification.ashx" /><br />
+        <img class="m-1" src="Handlers/DrawingVerification.ashx" /><br />
         <asp:TextBox CssClass="form-control" ID="txtConfirmCode" runat="server" placeholder="在此輸入驗證碼"></asp:TextBox><br />
     </div>
 

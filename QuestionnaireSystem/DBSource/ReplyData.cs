@@ -133,7 +133,12 @@ namespace DBSource
             }
         }
 
-
+        /// <summary>
+        /// 在填寫資料中印出那個填答人的回答
+        /// </summary>
+        /// <param name="UserGuid"></param>
+        /// <param name="ProbGuid"></param>
+        /// <returns></returns>
         public static DataRow GetReplyDataRow(Guid UserGuid, Guid ProbGuid)
         {
             string connectionString = DBHelper.GetConnectionString();
