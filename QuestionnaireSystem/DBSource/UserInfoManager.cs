@@ -295,6 +295,30 @@ namespace DBSource
             }
         }
 
+        /// <summary>
+        /// 以 QuesGuid 來刪除作答人
+        /// </summary>
+        /// <param name="QuesGuid"></param>
+        public static void DeleteReplyInfo(Guid QuesGuid)
+        {
+            string connectionString = DBHelper.GetConnectionString();
+            string dbCommandString =
+                $@" DELETE [ReplyInfo]
+                    WHERE [QuesGuid] = @quesGuid";
+
+            List<SqlParameter> paramList = new List<SqlParameter>();
+            paramList.Add(new SqlParameter("@quesGuid", QuesGuid));
+
+            try
+            {
+                DBHelper.ModifyData(connectionString, dbCommandString, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
+
         #endregion
 
     }

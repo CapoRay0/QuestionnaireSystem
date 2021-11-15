@@ -23,7 +23,6 @@ namespace QuestionnaireSystem.SystemAdminPages
                     this.txtStartDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
                     this.chkStatic.Checked = true;
 
-
                     // 套用常用問題 (此為顯示，在編輯問卷才能真正套用)
                     var commonProb = CommonProblem.GetCommon();
                     this.ddlCommon.DataSource = commonProb;
@@ -31,8 +30,6 @@ namespace QuestionnaireSystem.SystemAdminPages
                     this.ddlCommon.DataValueField = "CommID";
                     this.ddlCommon.DataBind();
                     this.lkbCommon.PostBackUrl = $"/SystemAdminPages/Detail.aspx?ID={id}#tabs2";
-
-
                 }
                 else if (!string.IsNullOrWhiteSpace(id) && id.Length == 36) // 編輯問卷
                 {
@@ -199,54 +196,61 @@ namespace QuestionnaireSystem.SystemAdminPages
                         }
                     }
                     #endregion
-
-                    #region 統計
-                    for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每個問題
-                    {
-                        Literal ltlStaticText = new Literal();
-                        ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString();
-                        if((bool)ProblemDT.Rows[i]["IsMust"] == true)
-                            ltlStaticText.Text += " (必填)";
-                        ltlStaticText.Text += "<br />";
-
-                        phStatic.Controls.Add(ltlStaticText); // 印出欲統計問題名
-
-                        int type = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
-                        if (type == 0 || type == 1) // 單選、複選
-                        {
-                            Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
-
-                            DataTable option = StaticData.GetStatic(pbGuid); // 該問題單一選項 (分子)
-
-                            DataRow sumDR = StaticData.GetStaticSum(pbGuid); // 該問題選擇數加總 (分母)
-                            int sum = Convert.ToInt32(sumDR["Sum"]);
-
-                            for (int j = 0; j < option.Rows.Count; j++)
-                            {
-                                int count = Convert.ToInt32(option.Rows[j]["Count"]);
-                                string probtext = option.Rows[j]["OptionText"].ToString();
-                                
-                                double percent = 0;
-                                string percentStr = "0";
-                                if(sum != 0)
-                                {
-                                    percent = ((double)count / (double)sum) * 100; // 轉成 double 型別後再運算
-                                    percentStr = percent.ToString("0.00"); // 保留小數點後2位
-                                }
-                                ltlStaticText.Text += "&nbsp &nbsp " + $"{probtext} {percentStr}% ({count})<br />";
-                            }
-                        }
-                        else
-                            ltlStaticText.Text += "&nbsp &nbsp -<br />";
-                        
-                        ltlStaticText.Text += "<br />";
-                        phStatic.Controls.Add(ltlStaticText);
-                    }
-                    #endregion
                 }
                 else
                     Response.Write("<Script language='JavaScript'>alert(' QueryString 錯誤，將您導向回列表頁'); location.href='SList.aspx'; </Script>");
             }
+            // if (!IsPostBack) 結束
+
+            #region 統計
+            if (!string.IsNullOrWhiteSpace(id) && id.Length == 36)
+            {
+                DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+                for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每個問題
+                {
+                    Literal ltlStaticText = new Literal();
+                    ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString();
+                    if ((bool)ProblemDT.Rows[i]["IsMust"] == true)
+                        ltlStaticText.Text += " (必填)";
+                    ltlStaticText.Text += "<br />";
+
+                    phStatic.Controls.Add(ltlStaticText); // 印出欲統計問題名
+
+                    int type = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
+                    if (type == 0 || type == 1) // 單選、複選
+                    {
+                        Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+
+                        DataTable option = StaticData.GetStatic(pbGuid); // 該問題單一選項 (分子)
+
+                        DataRow sumDR = StaticData.GetStaticSum(pbGuid); // 該問題選擇數加總 (分母)
+                        int sum = Convert.ToInt32(sumDR["Sum"]);
+
+                        for (int j = 0; j < option.Rows.Count; j++)
+                        {
+                            int count = Convert.ToInt32(option.Rows[j]["Count"]);
+                            string probtext = option.Rows[j]["OptionText"].ToString();
+
+                            double percent = 0;
+                            string percentStr = "0";
+                            if (sum != 0)
+                            {
+                                percent = ((double)count / (double)sum) * 100; // 轉成 double 型別後再運算
+                                percentStr = percent.ToString("0.00"); // 保留小數點後2位
+                            }
+                            ltlStaticText.Text += "&nbsp &nbsp " + $"{probtext} {percentStr}% ({count})<br />";
+                        }
+                    }
+                    else
+                        ltlStaticText.Text += "&nbsp &nbsp -<br />";
+
+                    ltlStaticText.Text += "<br />";
+                    phStatic.Controls.Add(ltlStaticText);
+                }
+            }
+            else
+                Response.Write("<Script language='JavaScript'>alert(' QueryString 錯誤，將您導向回列表頁'); location.href='SList.aspx'; </Script>");
+            #endregion
         }
 
         #region 問卷
@@ -618,6 +622,9 @@ namespace QuestionnaireSystem.SystemAdminPages
 
             StaticData.DeleteStaticData(idToGuid); // *先刪除統計資料
 
+            UserInfoManager.DeleteReplyInfo(idToGuid); // 刪除填答人資料
+
+
             for (int i = 0; i < SessionToDB.Rows.Count; i++)
             {
                 SessionToDB.Rows[i]["Count"] = i + 1;
@@ -645,7 +652,7 @@ namespace QuestionnaireSystem.SystemAdminPages
             }
 
             ProblemData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
-            Response.Write("<Script language='JavaScript'>alert('問題編輯成功!!'); location.href='SList.aspx'; </Script>");
+            Response.Write("<Script language='JavaScript'>alert('問題編輯成功!! 統計及填答人已被重置'); location.href='SList.aspx'; </Script>");
         }
 
 
