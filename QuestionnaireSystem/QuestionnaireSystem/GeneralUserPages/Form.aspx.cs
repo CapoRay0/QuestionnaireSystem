@@ -95,6 +95,7 @@ namespace QuestionnaireSystem.GeneralUserPages
         /// <param name="e"></param>
         protected void btnSendF_Click(object sender, EventArgs e)
         {
+            // https://dotblogs.com.tw/topcat/2008/03/05/1200
             // Request.QueryString >> 使用 Get  >> 透過網址(URL)後面的變數來接收參數
             // Request.Form        >> 使用 Post >> 表單送出資料後，從控制項接收參數
 
