@@ -22,6 +22,17 @@ namespace QuestionnaireSystem.SystemAdminPages
                 {
                     this.txtStartDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
                     this.chkStatic.Checked = true;
+
+
+                    // 套用常用問題 (此為顯示，在編輯問卷才能真正套用)
+                    var commonProb = CommonProblem.GetCommon();
+                    this.ddlCommon.DataSource = commonProb;
+                    this.ddlCommon.DataTextField = "Name";
+                    this.ddlCommon.DataValueField = "CommID";
+                    this.ddlCommon.DataBind();
+                    this.lkbCommon.PostBackUrl = $"/SystemAdminPages/Detail.aspx?ID={id}#tabs2";
+
+
                 }
                 else if (!string.IsNullOrWhiteSpace(id) && id.Length == 36) // 編輯問卷
                 {

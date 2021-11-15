@@ -43,7 +43,7 @@ namespace QuestionnaireSystem
 
             if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
             {
-                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確，請檢查英文大小寫')</script>");
                 return;
             }
 
