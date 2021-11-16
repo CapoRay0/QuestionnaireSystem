@@ -61,7 +61,7 @@ namespace QuestionnaireSystem.SystemAdminPages
                 this.UcPager.TotalSize = dt.Rows.Count;
                 this.UcPager.Bind();
             }
-            btnDelete.Attributes.Add("onclick ", "return confirm( '確定要將選取的問卷及旗下全部問題都刪除嗎?');"); // 刪除確認
+            btnDelete.Attributes.Add("onclick ", "return confirm( '確定要將選取的問卷及其問題、統計都刪除嗎?');"); // 刪除確認
         }
 
         /// <summary>
@@ -136,14 +136,10 @@ namespace QuestionnaireSystem.SystemAdminPages
                         ProblemData.DeleteProblemData(QuesGuid); // 刪除問卷中的所有問題
                         StaticData.DeleteStaticData(QuesGuid); // 刪除透過問題產生出來的統計
                     }
-
-                    Thread.Sleep(1);
                     QuestionnaireData.DeleteQuestionnaireData(quesID); // 刪除問卷
 
                     Response.Write($"<Script language='JavaScript'>alert('問卷刪除成功!!'); location.href='{this.Request.RawUrl}'; </Script>");
                 }
-                else
-                    Response.Write($"<Script language='JavaScript'>alert('未選取任何問卷哦~'); location.href='{this.Request.RawUrl}'; </Script>");
             }
             this.gvSList.DataBind();
 

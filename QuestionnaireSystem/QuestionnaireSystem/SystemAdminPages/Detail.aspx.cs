@@ -14,6 +14,14 @@ namespace QuestionnaireSystem.SystemAdminPages
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            #region 開發時隱藏
+            if (!AuthManager.IsLogined())
+            {
+                Response.Redirect("../Login.aspx");
+                return;
+            }
+            #endregion
+
             string id = this.Request.QueryString["ID"];
 
             if (!IsPostBack)
