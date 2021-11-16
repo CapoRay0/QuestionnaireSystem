@@ -248,8 +248,6 @@ namespace QuestionnaireSystem.SystemAdminPages
                     phStatic.Controls.Add(ltlStaticText);
                 }
             }
-            else
-                Response.Write("<Script language='JavaScript'>alert(' QueryString 錯誤，將您導向回列表頁'); location.href='SList.aspx'; </Script>");
             #endregion
         }
 
@@ -652,7 +650,7 @@ namespace QuestionnaireSystem.SystemAdminPages
             }
 
             ProblemData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
-            Response.Write("<Script language='JavaScript'>alert('問題編輯成功!! 統計及填答人已被重置'); location.href='SList.aspx'; </Script>");
+            Response.Write("<Script language='JavaScript'>alert('問題編輯成功!! 新增(重置)統計及填答人資料表'); location.href='SList.aspx'; </Script>");
         }
 
 
