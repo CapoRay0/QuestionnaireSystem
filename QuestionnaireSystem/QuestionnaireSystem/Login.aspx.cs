@@ -50,11 +50,11 @@ namespace QuestionnaireSystem
             #endregion
 
 
-            //如果帳號=密碼就是第一次登入，導向到更改密碼頁
-            if (inp_Account == inp_PWD)
-            {
-                Response.Redirect("ChangePWD.aspx");
-            }
+            ////如果帳號=密碼就是第一次登入，導向到更改密碼頁
+            //if (inp_Account == inp_PWD)
+            //{
+            //    Response.Redirect("ChangePWD.aspx");
+            //}
 
             //如果閒置10分鐘則強制登出
             //Session.Timeout = 10;
