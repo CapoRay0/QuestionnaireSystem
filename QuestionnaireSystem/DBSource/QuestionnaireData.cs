@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuestionnaireSystem.ORM.DBModels;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -47,7 +48,26 @@ namespace DBSource
                 return null;
             }
         }
+        public static List<Questionnaire> SearchQuestionnaireEF(string Search)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query = (from item in context.Questionnaires
+                                 where item.Caption.Contains(Search) || item.Description.Contains(Search)
+                                 select item);
 
+                    var list = query.ToList();
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
         /// <summary>
         /// 取得問卷資料表
         /// </summary>
@@ -73,6 +93,27 @@ namespace DBSource
             try
             {
                 return DBHelper.ReadDataTable(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+        public static List<Questionnaire> GetQuestionnaireEF()
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Questionnaires
+                         orderby item.QuesID descending
+                         select item);
+
+                    var list = query.ToList();
+                    return list;
+                }
             }
             catch (Exception ex)
             {
@@ -115,6 +156,27 @@ namespace DBSource
                 return null;
             }
         }
+        public static Questionnaire GetQuestionnaireDataRowEF(Guid QuesGuid)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Questionnaires
+                         where item.QuesGuid == QuesGuid
+                         select item);
+
+                    var list = query.FirstOrDefault();
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
 
         /// <summary>
         /// 以 QuesID 刪除資料行
@@ -133,6 +195,27 @@ namespace DBSource
             try
             {
                 DBHelper.ModifyData(connectionString, dbCommandString, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
+        public static void DeleteQuestionnaireDataEF(int QuesID)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var dbObjects = context.Questionnaires.Where(obj => obj.QuesID == QuesID);
+                    if (dbObjects != null)
+                    {
+                        foreach (var dbObject in dbObjects)
+                            context.Questionnaires.Remove(dbObject);
+
+                        context.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -160,6 +243,27 @@ namespace DBSource
             try
             {
                 return DBHelper.ReadDataRow(connectionString, dbCommandString, list);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
+        public static Questionnaire GetQuesIDForDeleteProblemEF(int QuesID)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Questionnaires
+                         where item.QuesID == QuesID
+                         select item);
+
+                    var list = query.FirstOrDefault();
+                    return list;
+                }
             }
             catch (Exception ex)
             {
@@ -200,6 +304,30 @@ namespace DBSource
                 return false;
             }
         }
+        public static void CloseQuesStateByTimeEF(int QuesID)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Questionnaires
+                         where item.QuesID == QuesID
+                         select item);
+
+                    var list = query.FirstOrDefault();
+                    if (list != null)
+                    {
+                        list.State = 0;
+                    }
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
 
         /// <summary>
         /// 新增問卷
@@ -211,7 +339,7 @@ namespace DBSource
         /// <param name="EndDate"></param>
         /// <param name="State"></param>
         /// <param name="Count"></param>
-        public static void CreateQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime EndDate ,int State, int Count)
+        public static void CreateQuestionnaire(Guid QuesGuid, string Caption, string Description, DateTime StartDate, DateTime EndDate, int State, int Count)
         {
             string connStr = DBHelper.GetConnectionString();
             string dbCommand =

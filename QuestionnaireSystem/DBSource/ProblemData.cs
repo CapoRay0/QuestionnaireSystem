@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuestionnaireSystem.ORM.DBModels;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -44,6 +45,28 @@ namespace DBSource
                 return null;
             }
         }
+        public static List<Problem> GetProblemEF(Guid QuesGuid)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Problems
+                         where item.QuesGuid == QuesGuid
+                         orderby item.Count
+                         select item);
+
+                    var list = query.ToList();
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
 
         /// <summary>
         /// 以 ProbGuid 取得該筆問題的內容
@@ -77,6 +100,27 @@ namespace DBSource
                 return null;
             }
         }
+        public static Problem GetProblemDataRowEF(Guid ProbGuid)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Problems
+                         where item.ProbGuid == ProbGuid
+                         select item);
+
+                    var list = query.FirstOrDefault();
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
 
         /// <summary>
         /// 以 QuesGuid 刪除所有問卷中的問題
@@ -95,6 +139,27 @@ namespace DBSource
             try
             {
                 DBHelper.ModifyData(connectionString, dbCommandString, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
+        public static void DeleteProblemDataEF(Guid QuesGuid)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var dbObjects = context.Problems.Where(obj => obj.QuesGuid == QuesGuid);
+                    if (dbObjects != null)
+                    {
+                        foreach (var dbObject in dbObjects)
+                            context.Problems.Remove(dbObject);
+
+                        context.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -155,6 +220,21 @@ namespace DBSource
                 logger.WriteLog(ex);
             }
         }
+        public static void CreateProblemEF(Problem problem)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    context.Problems.Add(problem);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
 
         /// <summary>
         /// 新增問題後更新問卷的問題數
@@ -189,6 +269,29 @@ namespace DBSource
             {
                 logger.WriteLog(ex);
                 return false;
+            }
+        }
+        public static void UpdateQuestionnaireCountEF(Guid QuesGuid, int Count)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Questionnaires
+                         where item.QuesGuid == QuesGuid
+                         select item);
+
+                    var list = query.FirstOrDefault();
+                    if (list != null)
+                        list.Count = Count;
+
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
             }
         }
         #endregion

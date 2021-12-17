@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuestionnaireSystem.ORM.DBModels;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -42,6 +43,27 @@ namespace DBSource
                 return null;
             }
         }
+        public static List<Common> GetCommonEF()
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Commons
+                         orderby item.CommID
+                         select item);
+
+                    var list = query.ToList();
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
 
         /// <summary>
         /// 以 CommID 取得該筆常用問題的內容
@@ -76,6 +98,27 @@ namespace DBSource
                 return null;
             }
         }
+        public static Common GetCommonByCommIDEF(int CommID)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var query =
+                        (from item in context.Commons
+                         where item.CommID == CommID
+                         select item);
+
+                    var list = query.FirstOrDefault();
+                    return list;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+                return null;
+            }
+        }
 
         /// <summary>
         /// 刪除常用問題中所有內容
@@ -91,6 +134,27 @@ namespace DBSource
             try
             {
                 DBHelper.ModifyData(connectionString, dbCommandString, paramList);
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+            }
+        }
+        public static void DeleteCommonDataEF()
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    var dbObjects = context.Commons;
+                    if (dbObjects != null)
+                    {
+                        foreach (var dbObject in dbObjects)
+                            context.Commons.Remove(dbObject);
+
+                        context.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -145,6 +209,22 @@ namespace DBSource
             catch (Exception ex)
             {
                 logger.WriteLog(ex);
+            }
+        }
+        public static void CreateCommonEF(Common common)
+        {
+            try
+            {
+                using (ContextModel context = new ContextModel())
+                {
+                    context.Commons.Add(common);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLog(ex);
+
             }
         }
 

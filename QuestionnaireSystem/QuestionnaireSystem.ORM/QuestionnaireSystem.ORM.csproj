@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1E6ECD08-A235-4068-8847-1EF46265099C}</ProjectGuid>
+    <ProjectGuid>{118EB69D-8EE0-4D81-8840-1CF89E91EF40}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DBSource</RootNamespace>
-    <AssemblyName>DBSource</AssemblyName>
+    <RootNamespace>QuestionnaireSystem.ORM</RootNamespace>
+    <AssemblyName>QuestionnaireSystem.ORM</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -42,9 +42,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,27 +53,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthManager.cs" />
-    <Compile Include="CommonProblem.cs" />
-    <Compile Include="DBHelper.cs" />
-    <Compile Include="logger.cs" />
-    <Compile Include="ProblemData.cs" />
+    <Compile Include="DBModels\Common.cs" />
+    <Compile Include="DBModels\ContextModel.cs" />
+    <Compile Include="DBModels\Problem.cs" />
+    <Compile Include="DBModels\Questionnaire.cs" />
+    <Compile Include="DBModels\Reply.cs" />
+    <Compile Include="DBModels\ReplyInfo.cs" />
+    <Compile Include="DBModels\Static.cs" />
+    <Compile Include="DBModels\SystemInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuestionnaireData.cs" />
-    <Compile Include="ReplyData.cs" />
-    <Compile Include="StaticData.cs" />
-    <Compile Include="UserInfoManager.cs" />
-    <Compile Include="UserInfoModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuestionnaireSystem.ORM\QuestionnaireSystem.ORM.csproj">
-      <Project>{118EB69D-8EE0-4D81-8840-1CF89E91EF40}</Project>
-      <Name>QuestionnaireSystem.ORM</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="Logs\Log.log" />
+    <None Include="App.Config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
