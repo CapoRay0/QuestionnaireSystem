@@ -1,4 +1,6 @@
 ﻿using DBSource;
+using QuestionnaireSystem.Extensions;
+using QuestionnaireSystem.ORM.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -28,9 +30,10 @@ namespace QuestionnaireSystem.Handlers
                 context.Response.End();
             }
 
-            Guid idToGuid = Guid.Parse(id);
-            DataTable dt = ProblemData.GetProblem(idToGuid); // 取得問題資料表
-            string jsonText = Newtonsoft.Json.JsonConvert.SerializeObject(dt);
+            //Guid idToGuid = Guid.Parse(id);
+            //DataTable dt = ProblemData.GetProblem(idToGuid); // 取得問題資料表
+            List<Problem> list = ProblemData.GetProblemEF(id.ToGuid()); // 取得問題資料表
+            string jsonText = Newtonsoft.Json.JsonConvert.SerializeObject(list);
 
             context.Response.ContentType = "application/json";
             context.Response.Write(jsonText);

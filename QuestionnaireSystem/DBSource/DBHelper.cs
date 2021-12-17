@@ -102,7 +102,7 @@ namespace DBSource
         }
 
         /// <summary>
-        /// 新增資料
+        /// 新增資料 >> 也可用 ModifyData(回傳值但不接收) 的方式代替 >> 多載 Overload
         /// </summary>
         /// <param name="connStr"></param>
         /// <param name="dbCommand"></param>

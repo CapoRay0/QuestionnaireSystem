@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using QuestionnaireSystem.ORM.DBModels;
 
 namespace QuestionnaireSystem.SystemAdminPages
 {
@@ -16,27 +17,33 @@ namespace QuestionnaireSystem.SystemAdminPages
             if (!IsPostBack)
             {
                 #region 問題部分
-                DataTable CommonDT = CommonProblem.GetCommon(); // 從 DB 抓問題
+                //DataTable CommonDT = CommonProblem.GetCommon(); // 從 DB 抓問題
+                List<ORM.DBModels.Common> CommonDT = CommonProblem.GetCommonEF(); // 從 DB 抓問題
 
                 if (Session["CommonDT"] == null)
                 {
-                    if (CommonDT.Rows.Count == 0)
+                    //if (CommonDT.Rows.Count == 0)
+                    if (CommonDT.Count == 0)
                         this.ltlMsg.Text = "<br /><br /><br />尚無問題";
 
-                    for (int i = 0; i < CommonDT.Rows.Count; i++)
-                        CommonDT.Rows[i]["Count"] = i + 1;
+                    //for (int i = 0; i < CommonDT.Rows.Count; i++)
+                    //   CommonDT.Rows[i]["Count"] = i + 1;
 
                     this.gvComm.DataSource = CommonDT;
                     this.gvComm.DataBind();
                 }
                 else
                 {
-                    DataTable NewCommonDT = (DataTable)Session["CommonDT"];
+                    //DataTable NewCommonDT = (DataTable)Session["CommonDT"];
+                    List<ORM.DBModels.Common> NewCommonList = (List<ORM.DBModels.Common>)Session["CommonDT"];
 
-                    for (int i = 0; i < NewCommonDT.Rows.Count; i++)
-                        NewCommonDT.Rows[i]["Count"] = i + 1;
+                    //for (int i = 0; i < NewCommonDT.Rows.Count; i++)
+                    //    NewCommonDT.Rows[i]["Count"] = i + 1;
+                    for (int i = 0; i < NewCommonList.Count; i++)
+                        NewCommonList[i].Count = i + 1;
 
-                    this.gvComm.DataSource = NewCommonDT;
+                    //this.gvComm.DataSource = NewCommonDT;
+                    this.gvComm.DataSource = NewCommonList;
                     this.gvComm.DataBind();
                 }
 
@@ -54,17 +61,30 @@ namespace QuestionnaireSystem.SystemAdminPages
                     if (Session["CommonDT"] != null) // Session
                     {
                         int CommID = Convert.ToInt32(Session["CommID"].ToString());
-                        DataTable CommDT = (DataTable)Session["CommonDT"];
+                        //DataTable CommDT = (DataTable)Session["CommonDT"];
+                        List<ORM.DBModels.Common> CommList = (List<ORM.DBModels.Common>)Session["CommonDT"];
 
-                        for (int i = 0; i < CommDT.Rows.Count; i++) // 找出要編輯的問題在第幾列
+                        //for (int i = 0; i < CommDT.Rows.Count; i++) // 找出要編輯的問題在第幾列
+                        //{
+                        //    if (CommID == Convert.ToInt32(CommDT.Rows[i]["CommID"]))
+                        //    {
+                        //        this.txtName.Text = CommDT.Rows[i]["Name"].ToString();
+                        //        this.txtQuestion.Text = CommDT.Rows[i]["Text"].ToString();
+                        //        this.ddlSelectionType.SelectedValue = CommDT.Rows[i]["SelectionType"].ToString();
+                        //        this.ckbIsMust.Checked = (bool)CommDT.Rows[i]["IsMust"];
+                        //        this.txtSelection.Text = CommDT.Rows[i]["Selection"].ToString();
+                        //        break;
+                        //    }
+                        //}
+                        for (int i = 0; i < CommList.Count; i++) // 找出要編輯的問題在第幾列
                         {
-                            if (CommID == Convert.ToInt32(CommDT.Rows[i]["CommID"]))
+                            if (CommID == Convert.ToInt32(CommList[i].CommID))
                             {
-                                this.txtName.Text = CommDT.Rows[i]["Name"].ToString();
-                                this.txtQuestion.Text = CommDT.Rows[i]["Text"].ToString();
-                                this.ddlSelectionType.SelectedValue = CommDT.Rows[i]["SelectionType"].ToString();
-                                this.ckbIsMust.Checked = (bool)CommDT.Rows[i]["IsMust"];
-                                this.txtSelection.Text = CommDT.Rows[i]["Selection"].ToString();
+                                this.txtName.Text = CommList[i].Name.ToString();
+                                this.txtQuestion.Text = CommList[i].Text.ToString();
+                                this.ddlSelectionType.SelectedValue = CommList[i].SelectionType.ToString();
+                                this.ckbIsMust.Checked = (bool)CommList[i].IsMust;
+                                this.txtSelection.Text = CommList[i].Selection.ToString();
                                 break;
                             }
                         }
@@ -73,14 +93,23 @@ namespace QuestionnaireSystem.SystemAdminPages
                     {
                         int CommID = Convert.ToInt32(Session["CommID"].ToString());
 
-                        DataRow OneCommon = CommonProblem.GetCommonByCommID(CommID);
+                        //DataRow OneCommon = CommonProblem.GetCommonByCommID(CommID);
+                        //if (OneCommon != null)
+                        //{
+                        //    this.txtName.Text = OneCommon["Name"].ToString();
+                        //    this.txtQuestion.Text = OneCommon["Text"].ToString();
+                        //    this.txtSelection.Text = OneCommon["Selection"].ToString();
+                        //    this.ddlSelectionType.SelectedValue = OneCommon["SelectionType"].ToString();
+                        //    this.ckbIsMust.Checked = (bool)OneCommon["IsMust"];
+                        //}
+                        ORM.DBModels.Common OneCommon = CommonProblem.GetCommonByCommIDEF(CommID);
                         if (OneCommon != null)
                         {
-                            this.txtName.Text = OneCommon["Name"].ToString();
-                            this.txtQuestion.Text = OneCommon["Text"].ToString();
-                            this.txtSelection.Text = OneCommon["Selection"].ToString();
-                            this.ddlSelectionType.SelectedValue = OneCommon["SelectionType"].ToString();
-                            this.ckbIsMust.Checked = (bool)OneCommon["IsMust"];
+                            this.txtName.Text = OneCommon.Name.ToString();
+                            this.txtQuestion.Text = OneCommon.Text.ToString();
+                            this.txtSelection.Text = OneCommon.Selection.ToString();
+                            this.ddlSelectionType.SelectedValue = OneCommon.SelectionType.ToString();
+                            this.ckbIsMust.Checked = (bool)OneCommon.IsMust;
                         }
                     }
                 }
@@ -113,20 +142,22 @@ namespace QuestionnaireSystem.SystemAdminPages
                 return;
             }
 
-            DataTable CommonDT = new DataTable();
+            //DataTable CommonDT = new DataTable();
+            List<ORM.DBModels.Common> CommonDT = new List<ORM.DBModels.Common>();
             if (Session["CommonDT"] == null)
-                CommonDT = CommonProblem.GetCommon(); // 最一開始從 DB 抓
+                //CommonDT = CommonProblem.GetCommon(); // 最一開始從 DB 抓
+                CommonDT = CommonProblem.GetCommonEF(); // 最一開始從 DB 抓
             else
-                CommonDT = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                //CommonDT = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                CommonDT = (List<ORM.DBModels.Common>)Session["CommonDT"]; // Session 若有資料就直接用
 
-
-            DataTable dtComm = new DataTable();
-            dtComm.Columns.Add(new DataColumn("Count", typeof(int)));
-            dtComm.Columns.Add(new DataColumn("Name", typeof(string)));
-            dtComm.Columns.Add(new DataColumn("Text", typeof(string)));
-            dtComm.Columns.Add(new DataColumn("SelectionType", typeof(int)));
-            dtComm.Columns.Add(new DataColumn("IsMust", typeof(bool)));
-            dtComm.Columns.Add(new DataColumn("Selection", typeof(string)));
+            //DataTable dtComm = new DataTable();
+            //dtComm.Columns.Add(new DataColumn("Count", typeof(int)));
+            //dtComm.Columns.Add(new DataColumn("Name", typeof(string)));
+            //dtComm.Columns.Add(new DataColumn("Text", typeof(string)));
+            //dtComm.Columns.Add(new DataColumn("SelectionType", typeof(int)));
+            //dtComm.Columns.Add(new DataColumn("IsMust", typeof(bool)));
+            //dtComm.Columns.Add(new DataColumn("Selection", typeof(string)));
 
             int selectedType = Convert.ToInt32(this.ddlSelectionType.SelectedValue);
 
@@ -134,36 +165,61 @@ namespace QuestionnaireSystem.SystemAdminPages
             {
                 int count = 1;
 
-                if (CommonDT.Rows.Count != 0)
-                    count = CommonDT.Rows.Count + 1;
+                //if (CommonDT.Rows.Count != 0)
+                //    count = CommonDT.Rows.Count + 1;
+                if (CommonDT.Count != 0)
+                    count = CommonDT.Count + 1;
 
-                DataRow drComm = dtComm.NewRow();
-                drComm["Count"] = count;
-                drComm["Name"] = this.txtName.Text;
-                drComm["Text"] = this.txtQuestion.Text;
-                drComm["SelectionType"] = selectedType;
-                drComm["IsMust"] = this.ckbIsMust.Checked;
-                drComm["Selection"] = this.txtSelection.Text;
+                //DataRow drComm = dtComm.NewRow();
+                //drComm["Count"] = count;
+                //drComm["Name"] = this.txtName.Text;
+                //drComm["Text"] = this.txtQuestion.Text;
+                //drComm["SelectionType"] = selectedType;
+                //drComm["IsMust"] = this.ckbIsMust.Checked;
+                //drComm["Selection"] = this.txtSelection.Text;
+                ORM.DBModels.Common listComm = new ORM.DBModels.Common()
+                {
+                    Count = count,
+                    Name = txtName.Text,
+                    Text = txtQuestion.Text,
+                    SelectionType = selectedType,
+                    IsMust = ckbIsMust.Checked,
+                    Selection = txtSelection.Text
+                };
 
-                dtComm.Rows.Add(drComm);
-                CommonDT.Merge(dtComm); // 將原本資料庫的問題加上新的問題 (DataTable合併)
+                //dtComm.Rows.Add(drComm);
+                //CommonDT.Merge(dtComm); // 將原本資料庫的問題加上新的問題 (DataTable合併)
+                CommonDT.Add(listComm);
             }
             else // 編輯問題
             {
                 int CommID = Convert.ToInt32(Session["CommID"].ToString());
 
-                for (int i = 0; i < CommonDT.Rows.Count; i++)
+                //for (int i = 0; i < CommonDT.Rows.Count; i++)
+                //{
+                //    if (CommID == Convert.ToInt32(CommonDT.Rows[i]["CommID"])) //找到符合的那一筆做更新
+                //    {
+                //        CommonDT.Rows[i]["Name"] = this.txtName.Text;
+                //        CommonDT.Rows[i]["Text"] = this.txtQuestion.Text;
+                //        CommonDT.Rows[i]["SelectionType"] = selectedType;
+                //        CommonDT.Rows[i]["IsMust"] = this.ckbIsMust.Checked;
+                //        CommonDT.Rows[i]["Selection"] = this.txtSelection.Text;
+                //        break;
+                //    }
+                //}
+                for (int i = 0; i < CommonDT.Count; i++)
                 {
-                    if (CommID == Convert.ToInt32(CommonDT.Rows[i]["CommID"])) //找到符合的那一筆做更新
+                    if (CommID == CommonDT[i].CommID) //找到符合的那一筆做更新
                     {
-                        CommonDT.Rows[i]["Name"] = this.txtName.Text;
-                        CommonDT.Rows[i]["Text"] = this.txtQuestion.Text;
-                        CommonDT.Rows[i]["SelectionType"] = selectedType;
-                        CommonDT.Rows[i]["IsMust"] = this.ckbIsMust.Checked;
-                        CommonDT.Rows[i]["Selection"] = this.txtSelection.Text;
+                        CommonDT[i].Name = this.txtName.Text;
+                        CommonDT[i].Text = this.txtQuestion.Text;
+                        CommonDT[i].SelectionType = selectedType;
+                        CommonDT[i].IsMust = this.ckbIsMust.Checked;
+                        CommonDT[i].Selection = this.txtSelection.Text;
                         break;
                     }
                 }
+
                 Session["CommID"] = null;
             }
             HttpContext.Current.Session["CommonDT"] = CommonDT;
@@ -181,8 +237,10 @@ namespace QuestionnaireSystem.SystemAdminPages
             if (row.RowType == DataControlRowType.DataRow)
             {
                 Label lbl = row.FindControl("lblSelectionType") as Label;
-                var dr = row.DataItem as DataRowView;
-                int ProbType = dr.Row.Field<int>("SelectionType");
+                //var dr = row.DataItem as DataRowView;
+                var dr = row.DataItem as ORM.DBModels.Common;
+                //int ProbType = dr.Row.Field<int>("SelectionType");
+                int ProbType = dr.SelectionType;
                 switch (ProbType)
                 {
                     case 0:
@@ -214,16 +272,20 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// <param name="e"></param>
         protected void btnDelete_Click(object sender, ImageClickEventArgs e)
         {
-            DataTable DTforDelete = new DataTable();
+            //DataTable DTforDelete = new DataTable();
+            List<ORM.DBModels.Common> ListforDelete = new List<ORM.DBModels.Common>();
 
             if (Session["CommonDT"] == null)
-                DTforDelete = CommonProblem.GetCommon(); // 最一開始從 DB 抓
+                //DTforDelete = CommonProblem.GetCommon(); // 最一開始從 DB 抓
+                ListforDelete = CommonProblem.GetCommonEF(); // 最一開始從 DB 抓
             else
-                DTforDelete = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                //DTforDelete = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                ListforDelete = (List<ORM.DBModels.Common>)Session["CommonDT"]; // Session 若有資料就直接用
 
             List<int> deleteNum = new List<int>();
 
-            for (int i = 0; i < DTforDelete.Rows.Count; i++)
+            //for (int i = 0; i < ListforDelete.Rows.Count; i++)
+            for (int i = 0; i < ListforDelete.Count; i++)
             {
                 CheckBox cb = (CheckBox)gvComm.Rows[i].FindControl("ckbDelete");
 
@@ -237,9 +299,10 @@ namespace QuestionnaireSystem.SystemAdminPages
             deleteNum.Reverse(); // 從最後面開始刪除 (溢位)
 
             foreach (int d in deleteNum)
-                DTforDelete.Rows.Remove(DTforDelete.Rows[d]);
+                //ListforDelete.Rows.Remove(ListforDelete.Rows[d]);
+                ListforDelete.Remove(ListforDelete[d]);
 
-            Session["CommonDT"] = DTforDelete;
+            Session["CommonDT"] = ListforDelete;
             this.gvComm.DataBind();
 
             Response.Redirect(this.Request.RawUrl);
@@ -278,7 +341,8 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// <param name="e"></param>
         protected void btnSendP_Click(object sender, EventArgs e)
         {
-            DataTable SessionToDB;
+            //DataTable SessionToDB;
+            List<ORM.DBModels.Common> SessionToDB;
 
             if (Session["CommonDT"] == null)
             {
@@ -286,28 +350,57 @@ namespace QuestionnaireSystem.SystemAdminPages
                 return;
             }
             else
-                SessionToDB = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                //SessionToDB = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                SessionToDB = (List<ORM.DBModels.Common>)Session["CommonDT"]; // Session 若有資料就直接用
 
             // 先刪除後加入
-            CommonProblem.DeleteCommonData();
+            CommonProblem.DeleteCommonDataEF();
 
+            //int Count = 0;
+            //for (int i = 0; i < SessionToDB.Rows.Count; i++)
+            //{
+            //    SessionToDB.Rows[i]["Count"] = i + 1;
+            //    Count = (int)SessionToDB.Rows[i]["Count"];
+            //    string Name = (string)SessionToDB.Rows[i]["Name"];
+            //    string Text = (string)SessionToDB.Rows[i]["Text"];
+            //    int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
+            //    bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
+
+            //    string Selection = "";
+            //    if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
+            //    {
+            //        Selection = (string)SessionToDB.Rows[i]["Selection"];
+            //    }
+
+            //    CommonProblem.CreateCommon(Count, Name, Text, SelectionType, IsMust, Selection);
+            //}
             int Count = 0;
-            for (int i = 0; i < SessionToDB.Rows.Count; i++)
+            for (int i = 0; i < SessionToDB.Count; i++)
             {
-                SessionToDB.Rows[i]["Count"] = i + 1;
-                Count = (int)SessionToDB.Rows[i]["Count"];
-                string Name = (string)SessionToDB.Rows[i]["Name"];
-                string Text = (string)SessionToDB.Rows[i]["Text"];
-                int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
-                bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
+                SessionToDB[i].Count = i + 1;
+                Count = (int)SessionToDB[i].Count;
+                string Name = (string)SessionToDB[i].Name;
+                string Text = (string)SessionToDB[i].Text;
+                int SelectionType = (int)SessionToDB[i].SelectionType;
+                bool IsMust = (bool)SessionToDB[i].IsMust;
 
                 string Selection = "";
                 if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
                 {
-                    Selection = (string)SessionToDB.Rows[i]["Selection"];
+                    Selection = (string)SessionToDB[i].Selection;
                 }
 
-                CommonProblem.CreateCommon(Count, Name, Text, SelectionType, IsMust, Selection);
+                ORM.DBModels.Common CreateCommon = new ORM.DBModels.Common()
+                {
+                    Count = Count,
+                    Name = Name,
+                    Text = Text,
+                    SelectionType = SelectionType,
+                    IsMust = IsMust,
+                    Selection = Selection
+                };
+
+                CommonProblem.CreateCommonEF(CreateCommon);
             }
 
             Response.Write("<Script language='JavaScript'>alert('常用問題編輯成功!!'); location.href='SList.aspx'; </Script>");

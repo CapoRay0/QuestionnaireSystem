@@ -1,4 +1,5 @@
 ﻿using DBSource;
+using QuestionnaireSystem.ORM.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -128,15 +129,18 @@ namespace QuestionnaireSystem.SystemAdminPages
                 {
                     int quesID = Convert.ToInt32(gvSList.Rows[i].Cells[1].Text);
                     
-                    DataRow QuesDataRow = QuestionnaireData.GetQuesIDForDeleteProblem(quesID);
+                    //DataRow QuesDataRow = QuestionnaireData.GetQuesIDForDeleteProblem(quesID);
+                    Questionnaire QuesDataRow = QuestionnaireData.GetQuesIDForDeleteProblemEF(quesID);
                     if(QuesDataRow != null)
                     {
-                        string QuesStr = QuesDataRow[0].ToString();
+                        //string QuesStr = QuesDataRow[0].ToString();
+                        string QuesStr = QuesDataRow.QuesGuid.ToString();
                         Guid QuesGuid = Guid.Parse(QuesStr); // 取得問卷Guid
-                        ProblemData.DeleteProblemData(QuesGuid); // 刪除問卷中的所有問題
+                        //ProblemData.DeleteProblemData(QuesGuid); // 刪除問卷中的所有問題
+                        ProblemData.DeleteProblemDataEF(QuesGuid); // 刪除問卷中的所有問題
                         StaticData.DeleteStaticData(QuesGuid); // 刪除透過問題產生出來的統計
                     }
-                    QuestionnaireData.DeleteQuestionnaireData(quesID); // 刪除問卷
+                    QuestionnaireData.DeleteQuestionnaireDataEF(quesID); // 刪除問卷
 
                     Response.Write($"<Script language='JavaScript'>alert('問卷刪除成功!!'); location.href='{this.Request.RawUrl}'; </Script>");
                 }

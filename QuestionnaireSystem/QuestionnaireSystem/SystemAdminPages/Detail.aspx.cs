@@ -7,6 +7,8 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using QuestionnaireSystem.Extensions;
+using QuestionnaireSystem.ORM.DBModels;
 
 namespace QuestionnaireSystem.SystemAdminPages
 {
@@ -32,7 +34,9 @@ namespace QuestionnaireSystem.SystemAdminPages
                     this.chkStatic.Checked = true;
 
                     // 套用常用問題 (此為顯示，在編輯問卷才能真正套用)
-                    var commonProb = CommonProblem.GetCommon();
+                    //var commonProb = CommonProblem.GetCommon();
+                    //this.ddlCommon.DataSource = commonProb;
+                    var commonProb = CommonProblem.GetCommonEF();
                     this.ddlCommon.DataSource = commonProb;
                     this.ddlCommon.DataTextField = "Name";
                     this.ddlCommon.DataValueField = "CommID";
@@ -42,7 +46,9 @@ namespace QuestionnaireSystem.SystemAdminPages
                 else if (!string.IsNullOrWhiteSpace(id) && id.Length == 36) // 編輯問卷
                 {
                     // 套用常用問題
-                    var commonProb = CommonProblem.GetCommon();
+                    //var commonProb = CommonProblem.GetCommon();
+                    //this.ddlCommon.DataSource = commonProb;
+                    var commonProb = CommonProblem.GetCommonEF();
                     this.ddlCommon.DataSource = commonProb;
                     this.ddlCommon.DataTextField = "Name";
                     this.ddlCommon.DataValueField = "CommID";
@@ -52,54 +58,69 @@ namespace QuestionnaireSystem.SystemAdminPages
                     this.lkbCommon.PostBackUrl = $"/SystemAdminPages/Detail.aspx?ID={id}#tabs2";
 
                     #region 問卷
-                    DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id)); // 從 DB 抓問卷
+                    //DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id)); // 從 DB 抓問卷
+                    Questionnaire QuesRow = QuestionnaireData.GetQuestionnaireDataRowEF(id.ToGuid()); // 從 DB 抓問卷
 
                     //先判斷 QuesGuid 是否有誤
-                    if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                    //if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                    if (QuesRow == null || QuesRow.QuesGuid.ToString() != id)
                     {
                         Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='SList.aspx'; </Script>");
                         return;
                     }
 
-                    this.txtCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
-                    this.txtDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+                    //this.txtCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
+                    //this.txtDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+                    this.txtCaption.Text = QuesRow.Caption.ToString(); // 帶入標題
+                    this.txtDescription.Text = QuesRow.Description.ToString(); // 帶入描述
 
-                    DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+                    //DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+                    DateTime startDate = DateTime.Parse(QuesRow.StartDate.ToString()); // 帶入開始日期
                     string StartString = startDate.ToString("yyyy-MM-dd");
                     if (StartString != "1800-01-01")
                         this.txtStartDate.Text = StartString;
 
-                    DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+                    //DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+                    DateTime endDate = DateTime.Parse(QuesRow.EndDate.ToString()); // 帶入結束日期
                     string EndString = endDate.ToString("yyyy-MM-dd");
                     if (EndString != "3000-12-31")
                         this.txtEndDate.Text = EndString;
 
-                    if (QuesRow["State"].ToString() == "1") // 帶入開放與否
+                    //if (QuesRow["State"].ToString() == "1") // 帶入開放與否
+                    if (QuesRow.State.ToString() == "1") // 帶入開放與否
                         this.chkStatic.Checked = true;
                     else
                         this.chkStatic.Checked = false;
                     #endregion
 
                     #region 問題
-                    DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+                    //DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+                    List<Problem> ProblemList = ProblemData.GetProblemEF(id.ToGuid()); // 從 DB 抓問題
 
                     if (Session["ProblemDT"] == null)
                     {
-                        if (ProblemDT.Rows.Count == 0)
+                        //if (ProblemDT.Rows.Count == 0)
+                        if (ProblemList.Count == 0)
                             this.ltlMsg.Text = "<br /><br /><br />尚無問題";
 
-                        for (int i = 0; i < ProblemDT.Rows.Count; i++)
-                            ProblemDT.Rows[i]["Count"] = i + 1;
+                        //for (int i = 0; i < ProblemDT.Rows.Count; i++)
+                        //    ProblemDT.Rows[i]["Count"] = i + 1;
+                        for (int i = 0; i < ProblemList.Count; i++)
+                            ProblemList[i].Count = i + 1;
 
-                        this.gvProb.DataSource = ProblemDT;
+                        //this.gvProb.DataSource = ProblemDT;
+                        this.gvProb.DataSource = ProblemList;
                         this.gvProb.DataBind();
                     }
                     else
                     {
-                        DataTable NewProblemDT = (DataTable)Session["ProblemDT"];
+                        //DataTable NewProblemDT = (DataTable)Session["ProblemDT"];
+                        List<Problem> NewProblemDT = (List<Problem>)Session["ProblemDT"];
 
-                        for (int i = 0; i < NewProblemDT.Rows.Count; i++)
-                            NewProblemDT.Rows[i]["Count"] = i + 1;
+                        //for (int i = 0; i < NewProblemDT.Rows.Count; i++)
+                        //    NewProblemDT.Rows[i]["Count"] = i + 1;
+                        for (int i = 0; i < NewProblemDT.Count; i++)
+                            NewProblemDT[i].Count = i + 1;
 
                         this.gvProb.DataSource = NewProblemDT;
                         this.gvProb.DataBind();
@@ -135,13 +156,18 @@ namespace QuestionnaireSystem.SystemAdminPages
                         else // 從資料庫抓值
                         {
                             Guid PbGuid = Guid.Parse(Session["PbGuid"].ToString());
-                            DataRow OneProblem = ProblemData.GetProblemDataRow(PbGuid);
+                            //DataRow OneProblem = ProblemData.GetProblemDataRow(PbGuid);
+                            Problem OneProblem = ProblemData.GetProblemDataRowEF(PbGuid);
                             if (OneProblem != null)
                             {
-                                this.txtQuestion.Text = OneProblem["Text"].ToString();
-                                this.txtSelection.Text = OneProblem["Selection"].ToString();
-                                this.ddlSelectionType.SelectedValue = OneProblem["SelectionType"].ToString();
-                                this.ckbIsMust.Checked = (bool)OneProblem["IsMust"];
+                                //this.txtQuestion.Text = OneProblem["Text"].ToString();
+                                //this.txtSelection.Text = OneProblem["Selection"].ToString();
+                                //this.ddlSelectionType.SelectedValue = OneProblem["SelectionType"].ToString();
+                                //this.ckbIsMust.Checked = (bool)OneProblem["IsMust"];
+                                this.txtQuestion.Text = OneProblem.Text.ToString();
+                                this.txtSelection.Text = OneProblem.Selection.ToString();
+                                this.ddlSelectionType.SelectedValue = OneProblem.SelectionType.ToString();
+                                this.ckbIsMust.Checked = (bool)OneProblem.IsMust;
                             }
                         }
                     }
@@ -186,14 +212,17 @@ namespace QuestionnaireSystem.SystemAdminPages
 
                             //使用 PlaceHolder 新增控制項：https://codertw.com/%E5%89%8D%E7%AB%AF%E9%96%8B%E7%99%BC/210860/
 
-                            for (int i = 0; i < ProblemDT.Rows.Count; i++) // 迴圈印出所有問題與回答
+                            //for (int i = 0; i < ProblemDT.Rows.Count; i++) // 迴圈印出所有問題與回答
+                            for (int i = 0; i < ProblemList.Count; i++) // 迴圈印出所有問題與回答
                             {
                                 Literal ltlProbText = new Literal();
-                                ltlProbText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString() + "<br />";
+                                //ltlProbText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString() + "<br />";
+                                ltlProbText.Text = (i + 1).ToString() + ". " + ProblemList[i].Text.ToString() + "<br />";
                                 phReply.Controls.Add(ltlProbText); // 印出問題名
 
                                 Literal ltlProbAnswer = new Literal();
-                                Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+                                //Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+                                Guid pbGuid = Guid.Parse(ProblemList[i].ProbGuid.ToString());
                                 DataRow AnsDR = ReplyData.GetReplyDataRow(Guid.Parse(Uid), pbGuid);
 
                                 ltlProbAnswer.Text = "&nbsp &nbsp " + AnsDR["AnswerText"].ToString() + "<br /><br />";
@@ -213,21 +242,27 @@ namespace QuestionnaireSystem.SystemAdminPages
             #region 統計
             if (!string.IsNullOrWhiteSpace(id) && id.Length == 36)
             {
-                DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
-                for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每個問題
+                //DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+                List<Problem> ProblemDT = ProblemData.GetProblemEF(id.ToGuid()); // 從 DB 抓問題
+                //for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每個問題
+                for (int i = 0; i < ProblemDT.Count; i++) // 每個問題
                 {
                     Literal ltlStaticText = new Literal();
-                    ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString();
-                    if ((bool)ProblemDT.Rows[i]["IsMust"] == true)
+                    //ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT.Rows[i]["Text"].ToString();
+                    ltlStaticText.Text = (i + 1).ToString() + ". " + ProblemDT[i].Text.ToString();
+                    //if ((bool)ProblemDT.Rows[i]["IsMust"] == true)
+                    if ((bool)ProblemDT[i].IsMust == true)
                         ltlStaticText.Text += " (必填)";
                     ltlStaticText.Text += "<br />";
 
                     phStatic.Controls.Add(ltlStaticText); // 印出欲統計問題名
 
-                    int type = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
+                    //int type = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
+                    int type = Convert.ToInt32(ProblemDT[i].SelectionType);
                     if (type == 0 || type == 1) // 單選、複選
                     {
-                        Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+                        //Guid pbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+                        Guid pbGuid = Guid.Parse(ProblemDT[i].ProbGuid.ToString());
 
                         DataTable option = StaticData.GetStatic(pbGuid); // 該問題單一選項 (分子)
 
@@ -288,7 +323,7 @@ namespace QuestionnaireSystem.SystemAdminPages
 
             if (string.IsNullOrWhiteSpace(id)) //新增問卷
             {
-                Guid inpQuesGuid = Guid.NewGuid();
+                Guid newQuesGuid = Guid.NewGuid();
                 string inpCaption = this.txtCaption.Text;
                 string inpDescription = this.txtDescription.Text;
 
@@ -314,7 +349,9 @@ namespace QuestionnaireSystem.SystemAdminPages
                 if (this.txtCaption.Text != "")
                 {
                     if ((inpEndDate - inpStartDate).Days > 0)
-                        QuestionnaireData.CreateQuestionnaire(inpQuesGuid, inpCaption, inpDescription, inpStartDate, inpEndDate, inpState, inpCount);
+                    {
+                        QuestionnaireData.CreateQuestionnaire(newQuesGuid, inpCaption, inpDescription, inpStartDate, inpEndDate, inpState, inpCount);
+                    } 
                     else
                     {
                         this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('日期不可為負的')</script>");
@@ -381,17 +418,30 @@ namespace QuestionnaireSystem.SystemAdminPages
             int commonID;
             if (int.TryParse(this.ddlCommon.SelectedValue, out commonID))
             {
-                DataRow commRow = CommonProblem.GetCommonByCommID(commonID);
+                //DataRow commRow = CommonProblem.GetCommonByCommID(commonID);
 
-                this.txtQuestion.Text = commRow["Text"].ToString();
+                //this.txtQuestion.Text = commRow["Text"].ToString();
 
-                int type = Convert.ToInt32(commRow["SelectionType"]);
+                //int type = Convert.ToInt32(commRow["SelectionType"]);
+                //this.ddlSelectionType.SelectedValue = type.ToString();
+
+                //this.ckbIsMust.Checked = (bool)commRow["IsMust"];
+
+                //if (type == 0 || type == 1)
+                //    this.txtSelection.Text = commRow["Selection"].ToString();
+                //else
+                //    this.txtSelection.Text = "";
+                ORM.DBModels.Common commRow = CommonProblem.GetCommonByCommIDEF(commonID);
+
+                this.txtQuestion.Text = commRow.Text.ToString();
+
+                int type = Convert.ToInt32(commRow.SelectionType);
                 this.ddlSelectionType.SelectedValue = type.ToString();
 
-                this.ckbIsMust.Checked = (bool)commRow["IsMust"];
+                this.ckbIsMust.Checked = (bool)commRow.IsMust;
 
                 if (type == 0 || type == 1)
-                    this.txtSelection.Text = commRow["Selection"].ToString();
+                    this.txtSelection.Text = commRow.Selection.ToString();
                 else
                     this.txtSelection.Text = "";
             }
@@ -423,25 +473,28 @@ namespace QuestionnaireSystem.SystemAdminPages
                 return;
             }
 
-            Guid idToGuid = Guid.Parse(id);
+            //Guid idToGuid = Guid.Parse(id);
 
             // 將資料庫的舊問題及頁面上加入的新問題一起放至新增的 DataTable 並存入 Session 中
-            DataTable ProblemDT = new DataTable();
+            //DataTable ProblemDT = new DataTable();
+            List<Problem> ProblemList = new List<Problem>();
 
             if (Session["ProblemDT"] == null)
-                ProblemDT = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                //ProblemDT = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                ProblemList = ProblemData.GetProblemEF(id.ToGuid()); // 最一開始從 DB 抓
             else
-                ProblemDT = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                //ProblemDT = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                ProblemList = (List<Problem>)Session["ProblemDT"]; // Session 若有資料就直接用
 
             // 創建一個新的 DataTable
-            DataTable dtProb = new DataTable();
-            dtProb.Columns.Add(new DataColumn("ProbGuid", typeof(Guid)));
-            dtProb.Columns.Add(new DataColumn("QuesGuid", typeof(Guid)));
-            dtProb.Columns.Add(new DataColumn("Count", typeof(int)));
-            dtProb.Columns.Add(new DataColumn("Text", typeof(string)));
-            dtProb.Columns.Add(new DataColumn("SelectionType", typeof(int)));
-            dtProb.Columns.Add(new DataColumn("IsMust", typeof(bool)));
-            dtProb.Columns.Add(new DataColumn("Selection", typeof(string)));
+            //DataTable dtProb = new DataTable();
+            //dtProb.Columns.Add(new DataColumn("ProbGuid", typeof(Guid)));
+            //dtProb.Columns.Add(new DataColumn("QuesGuid", typeof(Guid)));
+            //dtProb.Columns.Add(new DataColumn("Count", typeof(int)));
+            //dtProb.Columns.Add(new DataColumn("Text", typeof(string)));
+            //dtProb.Columns.Add(new DataColumn("SelectionType", typeof(int)));
+            //dtProb.Columns.Add(new DataColumn("IsMust", typeof(bool)));
+            //dtProb.Columns.Add(new DataColumn("Selection", typeof(string)));
 
             int selectedType = Convert.ToInt32(this.ddlSelectionType.SelectedValue);
 
@@ -449,39 +502,65 @@ namespace QuestionnaireSystem.SystemAdminPages
             {
                 int count = 1;
 
-                if (ProblemDT.Rows.Count != 0)
-                    count = ProblemDT.Rows.Count + 1;
+                //if (ProblemDT.Rows.Count != 0)
+                //    count = ProblemDT.Rows.Count + 1;
+                if (ProblemList.Count != 0)
+                    count = ProblemList.Count + 1;
 
-                DataRow drProb = dtProb.NewRow();
-                drProb["ProbGuid"] = Guid.NewGuid();
-                drProb["QuesGuid"] = idToGuid;
-                drProb["Count"] = count;
-                drProb["Text"] = this.txtQuestion.Text;
-                drProb["SelectionType"] = selectedType;
-                drProb["IsMust"] = this.ckbIsMust.Checked;
-                drProb["Selection"] = this.txtSelection.Text;
+                //DataRow drProb = dtProb.NewRow();
+                //drProb["ProbGuid"] = Guid.NewGuid();
+                //drProb["QuesGuid"] = idToGuid;
+                //drProb["Count"] = count;
+                //drProb["Text"] = this.txtQuestion.Text;
+                //drProb["SelectionType"] = selectedType;
+                //drProb["IsMust"] = this.ckbIsMust.Checked;
+                //drProb["Selection"] = this.txtSelection.Text;
+                Problem listProb = new Problem()
+                {
+                    ProbGuid = Guid.NewGuid(),
+                    QuesGuid = id.ToGuid(),
+                    Count = count,
+                    Text = this.txtQuestion.Text,
+                    SelectionType = selectedType,
+                    IsMust = this.ckbIsMust.Checked,
+                    Selection = this.txtSelection.Text
+                };
 
-                dtProb.Rows.Add(drProb);
-                ProblemDT.Merge(dtProb); // 將原本資料庫的問題加上新的問題 (DataTable合併)
+                //dtProb.Rows.Add(drProb);
+                //ProblemDT.Merge(dtProb); // 將原本資料庫的問題加上新的問題 (DataTable合併)
+                ProblemList.Add(listProb);
             }
             else // 編輯問題
             {
-                Guid ProblemGuid = Guid.Parse(Session["PbGuid"].ToString());
+                //Guid ProblemGuid = Guid.Parse(Session["PbGuid"].ToString());
+                Guid ProblemGuid = Session["PbGuid"].ToString().ToGuid();
 
-                for (int i = 0; i < ProblemDT.Rows.Count; i++)
+                //for (int i = 0; i < ProblemDT.Rows.Count; i++)
+                //{
+                //    if (Guid.Equals(ProblemGuid, ProblemDT.Rows[i]["ProbGuid"])) //找到符合的那一筆做更新
+                //    {
+                //        ProblemDT.Rows[i]["Text"] = this.txtQuestion.Text;
+                //        ProblemDT.Rows[i]["SelectionType"] = selectedType;
+                //        ProblemDT.Rows[i]["IsMust"] = this.ckbIsMust.Checked;
+                //        ProblemDT.Rows[i]["Selection"] = this.txtSelection.Text;
+                //        break;
+                //    }
+                //}
+                for (int i = 0; i < ProblemList.Count; i++)
                 {
-                    if (Guid.Equals(ProblemGuid, ProblemDT.Rows[i]["ProbGuid"])) //找到符合的那一筆做更新
+                    if (Guid.Equals(ProblemGuid, ProblemList[i].ProbGuid)) //找到符合的那一筆做更新
                     {
-                        ProblemDT.Rows[i]["Text"] = this.txtQuestion.Text;
-                        ProblemDT.Rows[i]["SelectionType"] = selectedType;
-                        ProblemDT.Rows[i]["IsMust"] = this.ckbIsMust.Checked;
-                        ProblemDT.Rows[i]["Selection"] = this.txtSelection.Text;
+                        ProblemList[i].Text = this.txtQuestion.Text;
+                        ProblemList[i].SelectionType = selectedType;
+                        ProblemList[i].IsMust = this.ckbIsMust.Checked;
+                        ProblemList[i].Selection = this.txtSelection.Text;
                         break;
                     }
                 }
                 Session["PbGuid"] = null;
             }
-            HttpContext.Current.Session["ProblemDT"] = ProblemDT;
+            //HttpContext.Current.Session["ProblemDT"] = ProblemDT;
+            HttpContext.Current.Session["ProblemDT"] = ProblemList;
             Response.Redirect($"/SystemAdminPages/Detail.aspx?ID={id}#tabs2");
         }
 
@@ -496,8 +575,10 @@ namespace QuestionnaireSystem.SystemAdminPages
             if (row.RowType == DataControlRowType.DataRow)
             {
                 Label lbl = row.FindControl("lblSelectionType") as Label;
-                var dr = row.DataItem as DataRowView;
-                int ProbType = dr.Row.Field<int>("SelectionType");
+                //var dr = row.DataItem as DataRowView;
+                var dr = row.DataItem as Problem;
+                //int ProbType = dr.Row.Field<int>("SelectionType");
+                int ProbType = dr.SelectionType;
                 switch (ProbType)
                 {
                     case 0:
@@ -535,18 +616,22 @@ namespace QuestionnaireSystem.SystemAdminPages
                 Response.Write($"<Script language='JavaScript'>alert('請先新增問卷'); location.href='SList.aspx'; </Script>");
                 return;
             }
-            Guid idToGuid = Guid.Parse(id);
+           // Guid idToGuid = Guid.Parse(id);
 
-            DataTable DTforDelete = new DataTable();
+            //DataTable DTforDelete = new DataTable();
+            List<Problem> DTforDelete = new List<Problem>();
 
             if (Session["ProblemDT"] == null)
-                DTforDelete = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                //DTforDelete = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                DTforDelete = ProblemData.GetProblemEF(id.ToGuid()); // 最一開始從 DB 抓
             else
-                DTforDelete = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                //DTforDelete = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                DTforDelete = (List<Problem>)Session["ProblemDT"]; // Session 若有資料就直接用
 
             List<int> deleteNum = new List<int>();
 
-            for (int i = 0; i < DTforDelete.Rows.Count; i++)
+            //for (int i = 0; i < DTforDelete.Rows.Count; i++)
+            for (int i = 0; i < DTforDelete.Count; i++)
             {
                 CheckBox cb = (CheckBox)gvProb.Rows[i].FindControl("ckbDelete");
 
@@ -560,7 +645,8 @@ namespace QuestionnaireSystem.SystemAdminPages
             deleteNum.Reverse(); // 從最後面開始刪除 (溢位)
 
             foreach (int d in deleteNum)
-                DTforDelete.Rows.Remove(DTforDelete.Rows[d]);
+                //DTforDelete.Rows.Remove(DTforDelete.Rows[d]);
+                DTforDelete.Remove(DTforDelete[d]);
 
             Session["ProblemDT"] = DTforDelete;
             this.gvProb.DataBind();
@@ -609,42 +695,73 @@ namespace QuestionnaireSystem.SystemAdminPages
                 return;
             }
 
-            Guid idToGuid = Guid.Parse(id);
-            DataTable SessionToDB;
+            //Guid idToGuid = Guid.Parse(id);
+            //DataTable SessionToDB;
+            List<Problem> SessionToDB;
 
             if (Session["ProblemDT"] == null)
             {
-                SessionToDB = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                //SessionToDB = ProblemData.GetProblem(idToGuid); // 最一開始從 DB 抓
+                SessionToDB = ProblemData.GetProblemEF(id.ToGuid()); // 最一開始從 DB 抓
                 Response.Write($"<Script language='JavaScript'>alert('好像什麼都沒變哦~'); location.href='Detail.aspx?ID={id}#tabs2'; </Script>");
                 return;
             }
             else
-                SessionToDB = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                //SessionToDB = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                //SessionToDB = (DataTable)Session["ProblemDT"]; // Session 若有資料就直接用
+                SessionToDB = (List<Problem>)Session["ProblemDT"]; // Session 若有資料就直接用
+                SessionToDB = (List<Problem>)Session["ProblemDT"]; // Session 若有資料就直接用
 
             // 先刪除後加入
-            ProblemData.DeleteProblemData(idToGuid);
+            //ProblemData.DeleteProblemData(idToGuid);
+            ProblemData.DeleteProblemDataEF(id.ToGuid());
 
             int Count = 0;
 
-            StaticData.DeleteStaticData(idToGuid); // *先刪除統計資料
+            StaticData.DeleteStaticData(id.ToGuid()); // *先刪除統計資料
 
-            UserInfoManager.DeleteReplyInfo(idToGuid); // 刪除填答人資料
+            UserInfoManager.DeleteReplyInfo(id.ToGuid()); // 刪除填答人資料
 
 
-            for (int i = 0; i < SessionToDB.Rows.Count; i++)
+            //for (int i = 0; i < SessionToDB.Rows.Count; i++)
+            //{
+            //    SessionToDB.Rows[i]["Count"] = i + 1;
+            //    Guid ProbGuid = (Guid)SessionToDB.Rows[i]["ProbGuid"];
+            //    Guid QuesGuid = (Guid)SessionToDB.Rows[i]["QuesGuid"];
+            //    Count = (int)SessionToDB.Rows[i]["Count"];
+            //    string Text = (string)SessionToDB.Rows[i]["Text"];
+            //    int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
+            //    bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
+
+            //    string Selection = "";
+            //    if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
+            //    {
+            //        Selection = (string)SessionToDB.Rows[i]["Selection"];
+
+            //        string[] OptionText = Selection.Split(';');
+
+            //        for (int j = 0; j < OptionText.Length; j++)
+            //        {
+            //            int StaticCount = 0;
+            //            StaticData.CreateStaticData(QuesGuid, ProbGuid, OptionText[j], StaticCount); // *後新增出來
+            //        }
+            //    }
+            //    ProblemData.CreateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection); // 將 Session 寫進資料庫
+            //}
+            for (int i = 0; i < SessionToDB.Count; i++)
             {
-                SessionToDB.Rows[i]["Count"] = i + 1;
-                Guid ProbGuid = (Guid)SessionToDB.Rows[i]["ProbGuid"];
-                Guid QuesGuid = (Guid)SessionToDB.Rows[i]["QuesGuid"];
-                Count = (int)SessionToDB.Rows[i]["Count"];
-                string Text = (string)SessionToDB.Rows[i]["Text"];
-                int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
-                bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
+                SessionToDB[i].Count = i + 1;
+                Guid ProbGuid = (Guid)SessionToDB[i].ProbGuid;
+                Guid QuesGuid = (Guid)SessionToDB[i].QuesGuid;
+                Count = (int)SessionToDB[i].Count;
+                string Text = (string)SessionToDB[i].Text;
+                int SelectionType = (int)SessionToDB[i].SelectionType;
+                bool IsMust = (bool)SessionToDB[i].IsMust;
 
                 string Selection = "";
                 if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
                 {
-                    Selection = (string)SessionToDB.Rows[i]["Selection"];
+                    Selection = (string)SessionToDB[i].Selection;
 
                     string[] OptionText = Selection.Split(';');
 
@@ -654,10 +771,22 @@ namespace QuestionnaireSystem.SystemAdminPages
                         StaticData.CreateStaticData(QuesGuid, ProbGuid, OptionText[j], StaticCount); // *後新增出來
                     }
                 }
-                ProblemData.CreateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection); // 將 Session 寫進資料庫
+                //ProblemData.CreateProblem(ProbGuid, QuesGuid, Count, Text, SelectionType, IsMust, Selection); // 將 Session 寫進資料庫
+                Problem CreateProblem = new Problem()
+                {
+                    ProbGuid = ProbGuid,
+                    QuesGuid = QuesGuid,
+                    Count = Count,
+                    Text = Text,
+                    SelectionType = SelectionType,
+                    IsMust = IsMust,
+                    Selection = Selection,
+                };
+                ProblemData.CreateProblemEF(CreateProblem); // 將 Session 寫進資料庫
             }
 
-            ProblemData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
+            //ProblemData.UpdateQuestionnaireCount(idToGuid, Count);// 更新回問卷的 Count 問題數
+            ProblemData.UpdateQuestionnaireCountEF(id.ToGuid(), Count);// 更新回問卷的 Count 問題數
             Response.Write("<Script language='JavaScript'>alert('問題編輯成功!! 新增(重置)統計及填答人資料表'); location.href='SList.aspx'; </Script>");
         }
 

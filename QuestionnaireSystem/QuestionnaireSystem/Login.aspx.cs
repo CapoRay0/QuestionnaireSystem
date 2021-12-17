@@ -41,26 +41,19 @@ namespace QuestionnaireSystem
             //驗證驗證碼
             #region 開發時隱藏
 
-            if (this.txtConfirmCode.Text.Trim() != Session["Verify"].ToString().Trim())
+            if (this.txtConfirmCode.Text.Trim().ToUpper() != Session["Verify"].ToString().Trim())
             {
-                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確，請檢查英文大小寫')</script>");
+                this.ClientScript.RegisterStartupScript(this.GetType(), "", "<script>alert('驗證碼不正確')</script>");
                 return;
             }
 
             #endregion
 
-
-            ////如果帳號=密碼就是第一次登入，導向到更改密碼頁
-            //if (inp_Account == inp_PWD)
-            //{
-            //    Response.Redirect("ChangePWD.aspx");
-            //}
-
             //如果閒置10分鐘則強制登出
             //Session.Timeout = 10;
 
             //登入成功，根據使用者等級導向至不同頁面
-            
+
             Response.Redirect("SystemAdminPages/SList.aspx");
             
         }

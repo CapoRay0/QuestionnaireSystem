@@ -1,4 +1,5 @@
 ﻿using DBSource;
+using QuestionnaireSystem.ORM.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,41 +12,53 @@ namespace QuestionnaireSystem.GeneralUserPages
 {
     public partial class GList : System.Web.UI.Page
     {
-        private DataTable dt;
+        //private DataTable dt;
+        private List<Questionnaire> list;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             Session.Abandon(); // 清空所有 Session
 
-            dt = QuestionnaireData.GetQuestionnaire();
+            //dt = QuestionnaireData.GetQuestionnaire();
+            list = QuestionnaireData.GetQuestionnaireEF();
 
             // 取得現在時間來判斷是否關閉問卷
-            for (int i = 0; i < dt.Rows.Count; i++)
+            //for (int i = 0; i < dt.Rows.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                if (dt.Rows[i]["EndDate"].ToString() != "")
+                //if (dt.Rows[i]["EndDate"].ToString() != "")
+                if (list[i].EndDate.ToString() != "")
                 {
-                    DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
-                    DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                    //DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+                    //DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                    //DateTime timeNow = DateTime.Now;
+                    //int quesIDToClose = Convert.ToInt32(dt.Rows[i][0].ToString()); //找到對應的流水號
+                    DateTime dbStart = Convert.ToDateTime(list[i].StartDate);
+                    DateTime dbEnd = Convert.ToDateTime(list[i].EndDate);
                     DateTime timeNow = DateTime.Now;
-                    int quesIDToClose = Convert.ToInt32(dt.Rows[i][0].ToString()); //找到對應的流水號
+                    int quesIDToClose = Convert.ToInt32(list[i].QuesID.ToString()); //找到對應的流水號
                     if ((timeNow - dbEnd).Days > 0)
-                        QuestionnaireData.CloseQuesStateByTime(quesIDToClose);
+                        QuestionnaireData.CloseQuesStateByTimeEF(quesIDToClose);
                     if ((timeNow - dbStart).Days < 0)
-                        QuestionnaireData.CloseQuesStateByTime(quesIDToClose);
+                        QuestionnaireData.CloseQuesStateByTimeEF(quesIDToClose);
                 }
             }
 
-            var dtPaged = this.GetPagedDataTable(dt);
+            //var dtPaged = this.GetPagedDataTable(dt);
+            var listPaged = this.GetPagedDataTable(list);
 
-            if (dt.Rows.Count == 0)
+            //if (dt.Rows.Count == 0)
+            if (list.Count == 0)
                 this.ltlMsg.Text = "<br /><br /><br />查無資料";
 
-            this.gvGList.DataSource = dtPaged;
+            //this.gvGList.DataSource = dtPaged;
+            this.gvGList.DataSource = listPaged;
 
             if (!IsPostBack)
             {
                 this.gvGList.DataBind();
-                this.UcPager.TotalSize = dt.Rows.Count;
+                //this.UcPager.TotalSize = dt.Rows.Count;
+                this.UcPager.TotalSize = list.Count;
                 this.UcPager.Bind();
             }
         }
@@ -58,12 +71,16 @@ namespace QuestionnaireSystem.GeneralUserPages
         protected void btnSearch_Click(object sender, EventArgs e)
         {
             var search = this.txtTitle.Text.Trim();
-            dt = QuestionnaireData.SearchQuestionnaire(search);
+            //dt = QuestionnaireData.SearchQuestionnaire(search);
+            list = QuestionnaireData.SearchQuestionnaireEF(search);
 
-            for (int i = 0; i < dt.Rows.Count; i++)
+            //for (int i = 0; i < dt.Rows.Count; i++)
+            for (int i = list.Count -1; i >= 0; i--)
             {
-                DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
-                DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                //DateTime dbStart = Convert.ToDateTime(dt.Rows[i]["StartDate"]);
+                //DateTime dbEnd = Convert.ToDateTime(dt.Rows[i]["EndDate"]);
+                DateTime dbStart = Convert.ToDateTime(list[i].StartDate);
+                DateTime dbEnd = Convert.ToDateTime(list[i].EndDate);
 
                 if (this.txtDateStart.Text != "" && this.txtDateEnd.Text != "") //開始結束都有填
                 {
@@ -72,28 +89,32 @@ namespace QuestionnaireSystem.GeneralUserPages
                     if ((searchEnd - searchStart).Days < 0)
                         Response.Write("<Script language='JavaScript'>alert('日期不可為負的'); location.href='GList.aspx'; </Script>");
                     if ((dbEnd - searchStart).Days < 0 || (dbStart - searchEnd).Days > 0)
-                        dt.Rows[i].Delete();
+                        //dt.Rows[i].Delete();
+                        list.RemoveAt(i);
                 }
                 else if (this.txtDateStart.Text != "" && this.txtDateEnd.Text == "") //只填開始時間
                 {
                     DateTime searchStart = Convert.ToDateTime(this.txtDateStart.Text);
                     if ((dbEnd - searchStart).Days < 0)
-                        dt.Rows[i].Delete();
+                        //dt.Rows[i].Delete();
+                        list.RemoveAt(i);
                 }
                 else if (this.txtDateStart.Text == "" && this.txtDateEnd.Text != "") //只填結束時間
                 {
                     DateTime searchEnd = Convert.ToDateTime(this.txtDateEnd.Text);
                     if ((dbStart - searchEnd).Days > 0)
-                        dt.Rows[i].Delete();
+                        //dt.Rows[i].Delete();
+                        list.RemoveAt(i);
                 }
             }
 
-            if (dt.Rows.Count == 0)
+            //if (dt.Rows.Count == 0)
+            if (list.Count == 0)
                 this.ltlMsg.Text = "<br /><br /><br />查無資料";
             else
                 this.ltlMsg.Text = "";
-
-            this.gvGList.DataSource = dt;
+            //this.gvGList.DataSource = dt;
+            this.gvGList.DataSource = list;
             this.gvGList.DataBind();
 
             UcPager.Visible = false;
@@ -114,10 +135,14 @@ namespace QuestionnaireSystem.GeneralUserPages
                 Label lblStartDate = row.FindControl("lblStartDate") as Label;
                 Label lblEndDate = row.FindControl("lblEndDate") as Label;
 
-                var dr = row.DataItem as DataRowView;
-                int QuesState = dr.Row.Field<int>("State");
-                string QuesCaption = dr.Row.Field<string>("Caption");
-                Guid QuesGuid = dr.Row.Field<Guid>("QuesGuid");
+                //var dr = row.DataItem as DataRowView;
+                var dr = row.DataItem as Questionnaire;
+                //int QuesState = dr.Row.Field<int>("State");
+                //string QuesCaption = dr.Row.Field<string>("Caption");
+                //Guid QuesGuid = dr.Row.Field<Guid>("QuesGuid");
+                int QuesState = dr.State;
+                string QuesCaption = dr.Caption;
+                Guid QuesGuid = dr.QuesGuid;
 
                 switch (QuesState)
                 {
@@ -131,13 +156,15 @@ namespace QuestionnaireSystem.GeneralUserPages
                         break;
                 }
 
-                DateTime QuesStartDate = dr.Row.Field<DateTime>("StartDate");
+                //DateTime QuesStartDate = dr.Row.Field<DateTime>("StartDate");
+                DateTime QuesStartDate = dr.StartDate;
                 if (QuesStartDate.ToString("yyyy-MM-dd") == "1800-01-01")
                     lblStartDate.Text = "-";
                 else
                     lblStartDate.Text = QuesStartDate.ToString("yyyy-MM-dd");
 
-                DateTime QuesEndDate = dr.Row.Field<DateTime>("EndDate");
+                //DateTime QuesEndDate = dr.Row.Field<DateTime>("EndDate");
+                DateTime QuesEndDate = dr.EndDate;
                 if (QuesEndDate.ToString("yyyy-MM-dd") == "3000-12-31")
                     lblEndDate.Text = "-";
                 else
@@ -162,6 +189,11 @@ namespace QuestionnaireSystem.GeneralUserPages
 
             return intPage;
         }
+        /// <summary>
+        /// DataTable 換頁 >> 被List取代，已棄用
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         private DataTable GetPagedDataTable(DataTable dt)
         {
             DataTable dtPaged = dt.Clone();
@@ -184,6 +216,14 @@ namespace QuestionnaireSystem.GeneralUserPages
                 dtPaged.Rows.Add(drNew);
             }
             return dtPaged;
+        }
+        private List<Questionnaire> GetPagedDataTable(List<Questionnaire> list)
+        {
+            int pageSize = this.UcPager.PageSize;
+            int startIndex = (this.GetCurrentPage() - 1) * pageSize;
+            //int endIndex = this.GetCurrentPage() * pageSize;
+
+            return list.Skip(startIndex).Take(10).ToList();
         }
         #endregion
 

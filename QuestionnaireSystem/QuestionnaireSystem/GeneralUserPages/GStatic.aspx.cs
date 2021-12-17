@@ -1,4 +1,6 @@
 ﻿using DBSource;
+using QuestionnaireSystem.Extensions;
+using QuestionnaireSystem.ORM.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,31 +31,40 @@ namespace QuestionnaireSystem.GeneralUserPages
             {
                 if (!string.IsNullOrWhiteSpace(id) && id.Length == 36)
                 {
-                    DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id)); // 從 DB 抓問卷
-                    DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+                    //DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id)); // 從 DB 抓問卷
+                    Questionnaire QuesRow = QuestionnaireData.GetQuestionnaireDataRowEF(id.ToGuid()); // 從 DB 抓問卷
+                    //DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+                    List<Problem> ProblemList = ProblemData.GetProblemEF(id.ToGuid()); // 從 DB 抓問題
 
                     //先判斷 QuesGuid 是否有誤
-                    if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                    //if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                    if (QuesRow == null || QuesRow.QuesGuid.ToString() != id)
                     {
                         Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
                         return;
                     }
                     else // 印出問卷名稱及描述內容
                     {
-                        this.ltlCaption.Text = "<h2>" + QuesRow["Caption"].ToString() + "</h2><br />";
-                        this.ltlDescription.Text = QuesRow["Description"].ToString();
+                        //this.ltlCaption.Text = "<h2>" + QuesRow["Caption"].ToString() + "</h2><br />";
+                        //this.ltlDescription.Text = QuesRow["Description"].ToString();
+                        this.ltlCaption.Text = "<h2>" + QuesRow.Caption.ToString() + "</h2><br />";
+                        this.ltlDescription.Text = QuesRow.Description.ToString();
                     }
 
-                    for (int perProblem = 0; perProblem < ProblemDT.Rows.Count; perProblem++) // 跑每個問題
+                    //for (int perProblem = 0; perProblem < ProblemDT.Rows.Count; perProblem++) // 跑每個問題
+                    for (int perProblem = 0; perProblem < ProblemList.Count; perProblem++) // 跑每個問題
                     {
-                        string probGuid = ProblemDT.Rows[perProblem]["ProbGuid"].ToString(); // 先以 QuesGuid 找問題DT
+                        //string probGuid = ProblemDT.Rows[perProblem]["ProbGuid"].ToString(); // 先以 QuesGuid 找問題DT
+                        string probGuid = ProblemList[perProblem].ProbGuid.ToString(); // 先以 QuesGuid 找問題DT
                         DataTable StaticDT = StaticData.GetStatic(Guid.Parse(probGuid)); // 再以問題DT的 ProbGuid 找統計DT >> 每一題
 
                         Label problemText = new Label();
-                        int type = Convert.ToInt32(ProblemDT.Rows[perProblem]["SelectionType"]);
+                        //int type = Convert.ToInt32(ProblemDT.Rows[perProblem]["SelectionType"]);
+                        int type = Convert.ToInt32(ProblemList[perProblem].SelectionType);
                         if (type == 0 || type == 1) // 單選、複選
                         {
-                            problemText.Text = (perProblem + 1).ToString() + "." + ProblemDT.Rows[perProblem]["Text"];
+                            //problemText.Text = (perProblem + 1).ToString() + "." + ProblemDT.Rows[perProblem]["Text"];
+                            problemText.Text = (perProblem + 1).ToString() + "." + ProblemList[perProblem].Text;
                             PlaceHolder1.Controls.Add(problemText); // 印出問題名，替代Chart的Title(圖形的標題集合)
 
                             Panel perChart = new Panel();// 一個圖表給他一個Panel，可佔去一行(自動換行)
@@ -63,7 +74,8 @@ namespace QuestionnaireSystem.GeneralUserPages
                         }
                         else // 文字
                         {
-                            problemText.Text = (perProblem + 1).ToString() + "." + ProblemDT.Rows[perProblem]["Text"] + "<br />&nbsp &nbsp -<br /><br /><br />";
+                            //problemText.Text = (perProblem + 1).ToString() + "." + ProblemDT.Rows[perProblem]["Text"] + "<br />&nbsp &nbsp -<br /><br /><br />";
+                            problemText.Text = (perProblem + 1).ToString() + "." + ProblemList[perProblem].Text + "<br />&nbsp &nbsp -<br /><br /><br />";
                             PlaceHolder1.Controls.Add(problemText);
                         }
                     }

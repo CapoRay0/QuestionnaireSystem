@@ -1,4 +1,6 @@
 ﻿using DBSource;
+using QuestionnaireSystem.Extensions;
+using QuestionnaireSystem.ORM.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,16 +23,20 @@ namespace QuestionnaireSystem.GeneralUserPages
                 return;
             }
 
-            DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id));  // 問卷
-            DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 問題
+            //DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(Guid.Parse(id));  // 問卷
+            Questionnaire QuesRow = QuestionnaireData.GetQuestionnaireDataRowEF(id.ToGuid());  // 問卷
+            //DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 問題
+            List<Problem> ProblemList = ProblemData.GetProblemEF(id.ToGuid()); // 問題
 
-            if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+            //if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+            if (QuesRow == null || QuesRow.QuesGuid.ToString() != id)
             {
                 Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
                 return;
             }
 
-            DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+            //DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+            DateTime startDate = DateTime.Parse(QuesRow.StartDate.ToString()); // 帶入開始日期
             string StartString = startDate.ToString("yyyy/MM/dd");
             if (StartString != "1800/01/01")
                 this.lblDuring.Text += StartString;
@@ -39,7 +45,8 @@ namespace QuestionnaireSystem.GeneralUserPages
 
             this.lblDuring.Text += " ~ "; // 開始日期與結束日期間的分隔
 
-            DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+            //DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+            DateTime endDate = DateTime.Parse(QuesRow.EndDate.ToString()); // 帶入結束日期
             string EndString = endDate.ToString("yyyy/MM/dd");
             if (EndString != "3000/12/31")
                 this.lblDuring.Text += EndString;
@@ -52,11 +59,14 @@ namespace QuestionnaireSystem.GeneralUserPages
                 Response.Write("<Script language='JavaScript'>alert('此問卷已經過期，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
 
             // 判斷問卷狀態是否關閉
-            if (Convert.ToInt32(QuesRow["State"]) == 0)
+            if (Convert.ToInt32(QuesRow.State) == 0)
+            if (Convert.ToInt32(QuesRow.State) == 0)
                 Response.Write("<Script language='JavaScript'>alert('此問卷已經關閉，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
 
-            this.lblCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
-            this.lblDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+            //this.lblCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
+            //this.lblDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+            this.lblCaption.Text = QuesRow.Caption.ToString(); // 帶入標題
+            this.lblDescription.Text = QuesRow.Description.ToString(); // 帶入描述
 
             // 從確認頁返回問卷填寫頁修改資料時回填
             if (Session["Name"] != null)
@@ -68,13 +78,22 @@ namespace QuestionnaireSystem.GeneralUserPages
             if (Session["Age"] != null)
                 this.lblAgeValue.Text = Session["Age"].ToString();
 
-            if (ProblemDT.Rows.Count > 0)
+            //if (ProblemDT.Rows.Count > 0)
+            //{
+            //    if (Session["Reply"] != null)
+            //    {
+            //        string[] reply = Session["Reply"].ToString().Split(';');
+            //        for (int i = 0; i < ProblemDT.Rows.Count; i++)
+            //            this.ltlReply.Text += $"<p>{i + 1}. {ProblemDT.Rows[i]["Text"]} <br /> &nbsp &nbsp {reply[i]}</p><br />"; // 印出作答的內容以供確認
+            //    }
+            //}
+            if (ProblemList.Count > 0)
             {
                 if (Session["Reply"] != null)
                 {
                     string[] reply = Session["Reply"].ToString().Split(';');
-                    for (int i = 0; i < ProblemDT.Rows.Count; i++)
-                        this.ltlReply.Text += $"<p>{i + 1}. {ProblemDT.Rows[i]["Text"]} <br /> &nbsp &nbsp {reply[i]}</p><br />"; // 印出作答的內容以供確認
+                    for (int i = 0; i < ProblemList.Count; i++)
+                        this.ltlReply.Text += $"<p>{i + 1}. {ProblemList[i].Text} <br /> &nbsp &nbsp {reply[i]}</p><br />"; // 印出作答的內容以供確認
                 }
             }
         }
@@ -99,7 +118,8 @@ namespace QuestionnaireSystem.GeneralUserPages
         {
             string id = this.Request.QueryString["ID"];
             Guid idToGuid = Guid.Parse(id);
-            DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 問題
+            //DataTable ProblemDT = ProblemData.GetProblem(idToGuid); // 問題
+            List<Problem> ProblemList = ProblemData.GetProblemEF(idToGuid); // 問題
 
             // 將個人基本資料輸入 ReplyInfo 資料表
             Guid UserGuid = Guid.NewGuid();
@@ -119,11 +139,15 @@ namespace QuestionnaireSystem.GeneralUserPages
             {
                 string[] answerText = Session["Reply"].ToString().Split(';'); // 取出以分號分割的回答
 
-                for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每一題
+                //for (int i = 0; i < ProblemDT.Rows.Count; i++) // 每一題
+                for (int i = 0; i < ProblemList.Count; i++) // 每一題
                 {
                     //Guid QuesGuid = Guid.Parse(ProblemDT.Rows[i]["QuesGuid"].ToString());
-                    Guid ProbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
-                    int SelectionType = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
+
+                    //Guid ProbGuid = Guid.Parse(ProblemDT.Rows[i]["ProbGuid"].ToString());
+                    //int SelectionType = Convert.ToInt32(ProblemDT.Rows[i]["SelectionType"]);
+                    Guid ProbGuid = Guid.Parse(ProblemList[i].ProbGuid.ToString());
+                    int SelectionType = Convert.ToInt32(ProblemList[i].SelectionType);
 
                     // 新增回答
                     ReplyData.CreateReply(UserGuid, ProbGuid, answerText[i]);

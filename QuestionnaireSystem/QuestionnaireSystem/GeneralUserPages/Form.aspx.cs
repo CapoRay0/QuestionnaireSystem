@@ -1,4 +1,6 @@
 ﻿using DBSource;
+using QuestionnaireSystem.Extensions;
+using QuestionnaireSystem.ORM.DBModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -23,16 +25,19 @@ namespace QuestionnaireSystem.GeneralUserPages
                     return;
                 }
 
-                Guid idToGuid = Guid.Parse(id);
-                DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid);  // 從 DB 抓問卷
+                //Guid idToGuid = Guid.Parse(id);
+                //DataRow QuesRow = QuestionnaireData.GetQuestionnaireDataRow(idToGuid);  // 從 DB 抓問卷
+                Questionnaire QuesRow = QuestionnaireData.GetQuestionnaireDataRowEF(id.ToGuid());  // 從 DB 抓問卷
 
-                if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                //if (QuesRow == null || QuesRow["QuesGuid"].ToString() != id)
+                if (QuesRow == null || QuesRow.QuesGuid.ToString() != id)
                 {
                     Response.Write("<Script language='JavaScript'>alert(' Guid 錯誤，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
                     return;
                 }
 
-                DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+                //DateTime startDate = DateTime.Parse(QuesRow["StartDate"].ToString()); // 帶入開始日期
+                DateTime startDate = DateTime.Parse(QuesRow.StartDate.ToString()); // 帶入開始日期
                 string StartString = startDate.ToString("yyyy/MM/dd");
                 if (StartString != "1800/01/01")
                     this.lblDuring.Text += StartString;
@@ -41,7 +46,8 @@ namespace QuestionnaireSystem.GeneralUserPages
 
                 this.lblDuring.Text += " ~ "; // 開始日期與結束日期間的分隔
 
-                DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+                //DateTime endDate = DateTime.Parse(QuesRow["EndDate"].ToString()); // 帶入結束日期
+                DateTime endDate = DateTime.Parse(QuesRow.EndDate.ToString()); // 帶入結束日期
                 string EndString = endDate.ToString("yyyy/MM/dd");
                 if (EndString != "3000/12/31")
                     this.lblDuring.Text += EndString;
@@ -54,14 +60,18 @@ namespace QuestionnaireSystem.GeneralUserPages
                     Response.Write("<Script language='JavaScript'>alert('此問卷已經過期，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
 
                 // 判斷問卷狀態是否關閉
-                if (Convert.ToInt32(QuesRow["State"]) == 0)
+                //if (Convert.ToInt32(QuesRow["State"]) == 0)
+                if (Convert.ToInt32(QuesRow.State) == 0)
                     Response.Write("<Script language='JavaScript'>alert('此問卷已經關閉，將您導向回列表頁'); location.href='GList.aspx'; </Script>");
 
-                this.lblCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
-                this.lblDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+                //this.lblCaption.Text = QuesRow["Caption"].ToString(); // 帶入標題
+                //this.lblDescription.Text = QuesRow["Description"].ToString(); // 帶入描述
+                this.lblCaption.Text = QuesRow.Caption.ToString(); // 帶入標題
+                this.lblDescription.Text = QuesRow.Description.ToString(); // 帶入描述
 
 
-                this.lblCount.Text = "共 " + QuesRow["Count"].ToString() + " 個問題";
+                //this.lblCount.Text = "共 " + QuesRow["Count"].ToString() + " 個問題";
+                this.lblCount.Text = "共 " + QuesRow.Count.ToString() + " 個問題";
 
 
                 // 從確認頁返回問卷填寫頁修改資料時回填
@@ -100,17 +110,21 @@ namespace QuestionnaireSystem.GeneralUserPages
             // Request.Form        >> 使用 Post >> 表單送出資料後，從控制項接收參數
 
             string id = this.Request.QueryString["ID"];
-            DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+            //DataTable ProblemDT = ProblemData.GetProblem(Guid.Parse(id)); // 從 DB 抓問題
+            List<Problem> ProblemList = ProblemData.GetProblemEF(id.ToGuid()); // 從 DB 抓問題
 
             string reply = string.Empty; // 裝回答 (以分號分隔)
 
             // 將單一問卷中每個問題的回答，一題一題加入 reply 字串中
-            for (int i = 0; i < ProblemDT.Rows.Count; i++)
+            //for (int i = 0; i < ProblemDT.Rows.Count; i++)
+            for (int i = 0; i < ProblemList.Count; i++)
             {
                 // 用 Request.Form 以問題資料表之 ProbGuid 抓取每個控制項的 name >> 回答分割；檢查必填
-                if (string.IsNullOrWhiteSpace(this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()])) // 沒有填 (null / "") 的話那一題就是 null
+                //if (string.IsNullOrWhiteSpace(this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()])) // 沒有填 (null / "") 的話那一題就是 null
+                if (string.IsNullOrWhiteSpace(this.Request.Form[ProblemList[i].ProbGuid.ToString()])) // 沒有填 (null / "") 的話那一題就是 null
                 {
-                    if ((bool)ProblemDT.Rows[i]["IsMust"] == true) // 沒填但是必填
+                    //if ((bool)ProblemDT.Rows[i]["IsMust"] == true) // 沒填但是必填
+                    if ((bool)ProblemList[i].IsMust == true) // 沒填但是必填
                     {
                         Response.Write("<Script language='JavaScript'>alert('必填問題尚未填妥'); </Script>");
                         return;
@@ -120,7 +134,8 @@ namespace QuestionnaireSystem.GeneralUserPages
                 }
                 else
                 {
-                    string inpValue = this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()]; // 表單送出資料後，從控制項接收參數
+                    //string inpValue = this.Request.Form[ProblemDT.Rows[i]["ProbGuid"].ToString()]; // 表單送出資料後，從控制項接收參數
+                    string inpValue = this.Request.Form[ProblemList[i].ProbGuid.ToString()]; // 表單送出資料後，從控制項接收參數
                     if (inpValue.Contains(";")) // 文字中不能含分號
                     {
                         Response.Write("<Script language='JavaScript'>alert('回答中不能包含分號'); </Script>");
@@ -130,7 +145,8 @@ namespace QuestionnaireSystem.GeneralUserPages
                     reply += inpValue; // 取每題的回答值
 
                     
-                    if (i < ProblemDT.Rows.Count - 1) // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等 >> 最後一題才不加分號
+                    //if (i < ProblemDT.Rows.Count - 1) // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等 >> 最後一題才不加分號
+                    if (i < ProblemList.Count - 1) // i 從 0 開始，所以永遠會比題號少，除非最後一圈跑完 i + 1 後變成兩者相等 >> 最後一題才不加分號
                         reply += ";"; // 以 ; 分割每個回答
                 }
             }
