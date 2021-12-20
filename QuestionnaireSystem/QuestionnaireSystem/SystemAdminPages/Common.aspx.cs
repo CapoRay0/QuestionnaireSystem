@@ -16,27 +16,27 @@ namespace QuestionnaireSystem.SystemAdminPages
             if (!IsPostBack)
             {
                 #region 問題部分
-                DataTable CommonDT = CommonProblem.GetCommon(); // 從 DB 抓問題
+                List<ORM.DBModels.Common> CommonList = CommonProblem.GetCommonEF(); // 從 DB 抓問題
 
-                if (Session["CommonDT"] == null)
+                if (Session["CommonList"] == null)
                 {
-                    if (CommonDT.Rows.Count == 0)
+                    if (CommonList.Count == 0)
                         this.ltlMsg.Text = "<br /><br /><br />尚無問題";
 
-                    for (int i = 0; i < CommonDT.Rows.Count; i++)
-                        CommonDT.Rows[i]["Count"] = i + 1;
+                    for (int i = 0; i < CommonList.Count; i++)
+                        CommonList[i].Count = i + 1;
 
-                    this.gvComm.DataSource = CommonDT;
+                    this.gvComm.DataSource = CommonList;
                     this.gvComm.DataBind();
                 }
                 else
                 {
-                    DataTable NewCommonDT = (DataTable)Session["CommonDT"];
+                    List<ORM.DBModels.Common> NewCommonList = (List<ORM.DBModels.Common>)Session["CommonList"];
 
-                    for (int i = 0; i < NewCommonDT.Rows.Count; i++)
-                        NewCommonDT.Rows[i]["Count"] = i + 1;
+                    for (int i = 0; i < NewCommonList.Count; i++)
+                        NewCommonList[i].Count = i + 1;
 
-                    this.gvComm.DataSource = NewCommonDT;
+                    this.gvComm.DataSource = NewCommonList;
                     this.gvComm.DataBind();
                 }
 
@@ -45,42 +45,42 @@ namespace QuestionnaireSystem.SystemAdminPages
                 this.ltlMsg.Text = "";
 
                 // 進入編輯模式：判斷是否為"新加入的問題"，或是原本 DB 就有
-                if (Session["CommID"] != null)
+                if (Session["Count"] != null)
                 {
                     this.btnDelete.Enabled = false;
                     this.ltlMsg.Text = "修改模式下無法刪除問題";
 
                     // 判斷 Session 是否有東西，有的話用 Session 回填，沒有則從 DB 抓
-                    if (Session["CommonDT"] != null) // Session
+                    if (Session["CommonList"] != null) // Session
                     {
-                        int CommID = Convert.ToInt32(Session["CommID"].ToString());
-                        DataTable CommDT = (DataTable)Session["CommonDT"];
+                        int CountID = Convert.ToInt32(Session["Count"].ToString());
+                        List<ORM.DBModels.Common> CommList = (List<ORM.DBModels.Common>)Session["CommonList"];
 
-                        for (int i = 0; i < CommDT.Rows.Count; i++) // 找出要編輯的問題在第幾列
+                        for (int i = 0; i < CommList.Count; i++) // 找出要編輯的問題在第幾列
                         {
-                            if (CommID == Convert.ToInt32(CommDT.Rows[i]["CommID"]))
+                            if (CountID == Convert.ToInt32(CommList[i].Count))
                             {
-                                this.txtName.Text = CommDT.Rows[i]["Name"].ToString();
-                                this.txtQuestion.Text = CommDT.Rows[i]["Text"].ToString();
-                                this.ddlSelectionType.SelectedValue = CommDT.Rows[i]["SelectionType"].ToString();
-                                this.ckbIsMust.Checked = (bool)CommDT.Rows[i]["IsMust"];
-                                this.txtSelection.Text = CommDT.Rows[i]["Selection"].ToString();
+                                this.txtName.Text = CommList[i].Name.ToString();
+                                this.txtQuestion.Text = CommList[i].Text.ToString();
+                                this.ddlSelectionType.SelectedValue = CommList[i].SelectionType.ToString();
+                                this.ckbIsMust.Checked = (bool)CommList[i].IsMust;
+                                this.txtSelection.Text = CommList[i].Selection.ToString();
                                 break;
                             }
                         }
                     }
                     else // 進頁面後直接修改 DB (只會跑第一次)
                     {
-                        int CommID = Convert.ToInt32(Session["CommID"].ToString());
+                        int CountID = Convert.ToInt32(Session["Count"].ToString());
 
-                        DataRow OneCommon = CommonProblem.GetCommonByCommID(CommID);
+                        ORM.DBModels.Common OneCommon = CommonProblem.GetCommonByCommIDEF(CountID);
                         if (OneCommon != null)
                         {
-                            this.txtName.Text = OneCommon["Name"].ToString();
-                            this.txtQuestion.Text = OneCommon["Text"].ToString();
-                            this.txtSelection.Text = OneCommon["Selection"].ToString();
-                            this.ddlSelectionType.SelectedValue = OneCommon["SelectionType"].ToString();
-                            this.ckbIsMust.Checked = (bool)OneCommon["IsMust"];
+                            this.txtName.Text = OneCommon.Name.ToString();
+                            this.txtQuestion.Text = OneCommon.Text.ToString();
+                            this.txtSelection.Text = OneCommon.Selection.ToString();
+                            this.ddlSelectionType.SelectedValue = OneCommon.SelectionType.ToString();
+                            this.ckbIsMust.Checked = (bool)OneCommon.IsMust;
                         }
                     }
                 }
@@ -113,60 +113,71 @@ namespace QuestionnaireSystem.SystemAdminPages
                 return;
             }
 
-            DataTable CommonDT = new DataTable();
-            if (Session["CommonDT"] == null)
-                CommonDT = CommonProblem.GetCommon(); // 最一開始從 DB 抓
+            List<ORM.DBModels.Common> CommonList = new List<ORM.DBModels.Common>();
+            if (Session["CommonList"] == null)
+                CommonList = CommonProblem.GetCommonEF(); // 最一開始從 DB 抓
             else
-                CommonDT = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                CommonList = (List<ORM.DBModels.Common>)Session["CommonList"]; // Session 若有資料就直接用
 
 
-            DataTable dtComm = new DataTable();
-            dtComm.Columns.Add(new DataColumn("Count", typeof(int)));
-            dtComm.Columns.Add(new DataColumn("Name", typeof(string)));
-            dtComm.Columns.Add(new DataColumn("Text", typeof(string)));
-            dtComm.Columns.Add(new DataColumn("SelectionType", typeof(int)));
-            dtComm.Columns.Add(new DataColumn("IsMust", typeof(bool)));
-            dtComm.Columns.Add(new DataColumn("Selection", typeof(string)));
+            //DataTable dtComm = new DataTable();
+            //dtComm.Columns.Add(new DataColumn("Count", typeof(int)));
+            //dtComm.Columns.Add(new DataColumn("Name", typeof(string)));
+            //dtComm.Columns.Add(new DataColumn("Text", typeof(string)));
+            //dtComm.Columns.Add(new DataColumn("SelectionType", typeof(int)));
+            //dtComm.Columns.Add(new DataColumn("IsMust", typeof(bool)));
+            //dtComm.Columns.Add(new DataColumn("Selection", typeof(string)));
 
             int selectedType = Convert.ToInt32(this.ddlSelectionType.SelectedValue);
 
-            if (Session["CommID"] == null) // 新增問題
+            if (Session["Count"] == null) // 新增問題
             {
                 int count = 1;
 
-                if (CommonDT.Rows.Count != 0)
-                    count = CommonDT.Rows.Count + 1;
+                if (CommonList.Count != 0)
+                    count = CommonList.Count + 1;
 
-                DataRow drComm = dtComm.NewRow();
-                drComm["Count"] = count;
-                drComm["Name"] = this.txtName.Text;
-                drComm["Text"] = this.txtQuestion.Text;
-                drComm["SelectionType"] = selectedType;
-                drComm["IsMust"] = this.ckbIsMust.Checked;
-                drComm["Selection"] = this.txtSelection.Text;
+                //DataRow drComm = dtComm.NewRow();
+                //drComm["Count"] = count;
+                //drComm["Name"] = this.txtName.Text;
+                //drComm["Text"] = this.txtQuestion.Text;
+                //drComm["SelectionType"] = selectedType;
+                //drComm["IsMust"] = this.ckbIsMust.Checked;
+                //drComm["Selection"] = this.txtSelection.Text;
 
-                dtComm.Rows.Add(drComm);
-                CommonDT.Merge(dtComm); // 將原本資料庫的問題加上新的問題 (DataTable合併)
+                ORM.DBModels.Common newComm = new ORM.DBModels.Common()
+                {
+                    Count = count,
+                    Name = this.txtName.Text,
+                    Text = this.txtQuestion.Text,
+                    SelectionType = selectedType,
+                    IsMust = this.ckbIsMust.Checked,
+                    Selection = this.txtSelection.Text
+                };
+
+                CommonList.Add(newComm);
+                //dtComm.Rows.Add(drComm);
+                //CommonDT.Merge(dtComm); // 將原本資料庫的問題加上新的問題 (DataTable合併)
             }
             else // 編輯問題
             {
-                int CommID = Convert.ToInt32(Session["CommID"].ToString());
+                int CommID = Convert.ToInt32(Session["Count"].ToString());
 
-                for (int i = 0; i < CommonDT.Rows.Count; i++)
+                for (int i = 0; i < CommonList.Count; i++)
                 {
-                    if (CommID == Convert.ToInt32(CommonDT.Rows[i]["CommID"])) //找到符合的那一筆做更新
+                    if (CommID == Convert.ToInt32(CommonList[i].Count)) //找到符合的那一筆做更新
                     {
-                        CommonDT.Rows[i]["Name"] = this.txtName.Text;
-                        CommonDT.Rows[i]["Text"] = this.txtQuestion.Text;
-                        CommonDT.Rows[i]["SelectionType"] = selectedType;
-                        CommonDT.Rows[i]["IsMust"] = this.ckbIsMust.Checked;
-                        CommonDT.Rows[i]["Selection"] = this.txtSelection.Text;
+                        CommonList[i].Name = this.txtName.Text;
+                        CommonList[i].Text = this.txtQuestion.Text;
+                        CommonList[i].SelectionType = selectedType;
+                        CommonList[i].IsMust = this.ckbIsMust.Checked;
+                        CommonList[i].Selection = this.txtSelection.Text;
                         break;
                     }
                 }
-                Session["CommID"] = null;
+                Session["Count"] = null;
             }
-            HttpContext.Current.Session["CommonDT"] = CommonDT;
+            HttpContext.Current.Session["CommonList"] = CommonList;
             Response.Redirect(this.Request.RawUrl);
         }
 
@@ -181,8 +192,8 @@ namespace QuestionnaireSystem.SystemAdminPages
             if (row.RowType == DataControlRowType.DataRow)
             {
                 Label lbl = row.FindControl("lblSelectionType") as Label;
-                var dr = row.DataItem as DataRowView;
-                int ProbType = dr.Row.Field<int>("SelectionType");
+                var dr = row.DataItem as ORM.DBModels.Common;
+                int ProbType = dr.SelectionType;
                 switch (ProbType)
                 {
                     case 0:
@@ -214,16 +225,16 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// <param name="e"></param>
         protected void btnDelete_Click(object sender, ImageClickEventArgs e)
         {
-            DataTable DTforDelete = new DataTable();
+            List<ORM.DBModels.Common> ListforDelete = new List<ORM.DBModels.Common>();
 
-            if (Session["CommonDT"] == null)
-                DTforDelete = CommonProblem.GetCommon(); // 最一開始從 DB 抓
+            if (Session["CommonList"] == null)
+                ListforDelete = CommonProblem.GetCommonEF(); // 最一開始從 DB 抓
             else
-                DTforDelete = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                ListforDelete = (List<ORM.DBModels.Common>)Session["CommonList"]; // Session 若有資料就直接用
 
             List<int> deleteNum = new List<int>();
 
-            for (int i = 0; i < DTforDelete.Rows.Count; i++)
+            for (int i = 0; i < ListforDelete.Count; i++)
             {
                 CheckBox cb = (CheckBox)gvComm.Rows[i].FindControl("ckbDelete");
 
@@ -237,9 +248,9 @@ namespace QuestionnaireSystem.SystemAdminPages
             deleteNum.Reverse(); // 從最後面開始刪除 (溢位)
 
             foreach (int d in deleteNum)
-                DTforDelete.Rows.Remove(DTforDelete.Rows[d]);
+                ListforDelete.Remove(ListforDelete[d]);
 
-            Session["CommonDT"] = DTforDelete;
+            Session["CommonList"] = ListforDelete;
             this.gvComm.DataBind();
 
             Response.Redirect(this.Request.RawUrl);
@@ -254,8 +265,8 @@ namespace QuestionnaireSystem.SystemAdminPages
         {
             if (e.CommandName == "CommEdit")
             {
-                var CommID = e.CommandArgument.ToString();
-                HttpContext.Current.Session["CommID"] = CommID;
+                var CountID = e.CommandArgument.ToString();
+                HttpContext.Current.Session["Count"] = CountID;
                 Response.Redirect(this.Request.RawUrl);
             }
         }
@@ -278,36 +289,46 @@ namespace QuestionnaireSystem.SystemAdminPages
         /// <param name="e"></param>
         protected void btnSendP_Click(object sender, EventArgs e)
         {
-            DataTable SessionToDB;
+            List<ORM.DBModels.Common> SessionToDB;
 
-            if (Session["CommonDT"] == null)
+            if (Session["CommonList"] == null)
             {
                 Response.Write($"<Script language='JavaScript'>alert('好像什麼都沒變哦~'); location.href='Common.aspx'; </Script>");
                 return;
             }
             else
-                SessionToDB = (DataTable)Session["CommonDT"]; // Session 若有資料就直接用
+                SessionToDB = (List<ORM.DBModels.Common>)Session["CommonList"]; // Session 若有資料就直接用
 
             // 先刪除後加入
-            CommonProblem.DeleteCommonData();
+            CommonProblem.DeleteCommonDataEF();
 
             int Count = 0;
-            for (int i = 0; i < SessionToDB.Rows.Count; i++)
+            for (int i = 0; i < SessionToDB.Count; i++)
             {
-                SessionToDB.Rows[i]["Count"] = i + 1;
-                Count = (int)SessionToDB.Rows[i]["Count"];
-                string Name = (string)SessionToDB.Rows[i]["Name"];
-                string Text = (string)SessionToDB.Rows[i]["Text"];
-                int SelectionType = (int)SessionToDB.Rows[i]["SelectionType"];
-                bool IsMust = (bool)SessionToDB.Rows[i]["IsMust"];
+                SessionToDB[i].Count = i + 1;
+                Count = (int)SessionToDB[i].Count;
+                string Name = (string)SessionToDB[i].Name;
+                string Text = (string)SessionToDB[i].Text;
+                int SelectionType = (int)SessionToDB[i].SelectionType;
+                bool IsMust = (bool)SessionToDB[i].IsMust;
 
                 string Selection = "";
                 if (SelectionType == 0 || SelectionType == 1) // 只有單選和複選需要內容
                 {
-                    Selection = (string)SessionToDB.Rows[i]["Selection"];
+                    Selection = (string)SessionToDB[i].Selection;
                 }
 
-                CommonProblem.CreateCommon(Count, Name, Text, SelectionType, IsMust, Selection);
+                ORM.DBModels.Common createComm = new ORM.DBModels.Common()
+                {
+                    Count = Count,
+                    Name = Name,
+                    Text = Text,
+                    SelectionType = SelectionType,
+                    IsMust = IsMust,
+                    Selection = Selection
+                };
+
+                CommonProblem.CreateCommonEF(createComm);
             }
 
             Response.Write("<Script language='JavaScript'>alert('常用問題編輯成功!!'); location.href='SList.aspx'; </Script>");

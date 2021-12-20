@@ -98,7 +98,12 @@ namespace DBSource
                 return null;
             }
         }
-        public static Common GetCommonByCommIDEF(int CommID)
+        /// <summary>
+        /// DataTable >> List 將原本的 CommID 改成用 Count 查找
+        /// </summary>
+        /// <param name="Count"></param>
+        /// <returns></returns>
+        public static Common GetCommonByCommIDEF(int Count)
         {
             try
             {
@@ -106,7 +111,7 @@ namespace DBSource
                 {
                     var query =
                         (from item in context.Commons
-                         where item.CommID == CommID
+                         where item.Count == Count
                          select item);
 
                     var list = query.FirstOrDefault();
@@ -151,9 +156,8 @@ namespace DBSource
                     {
                         foreach (var dbObject in dbObjects)
                             context.Commons.Remove(dbObject);
-
-                        context.SaveChanges();
                     }
+                    context.SaveChanges();
                 }
             }
             catch (Exception ex)

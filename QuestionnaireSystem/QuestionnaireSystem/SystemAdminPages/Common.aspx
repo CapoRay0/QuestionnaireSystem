@@ -75,7 +75,7 @@
 
                     <asp:TemplateField>
                         <ItemTemplate>
-                            <asp:Button ID="btnEdit" runat="server" Text="編輯" CommandName="CommEdit" CommandArgument='<%# Eval("CommID") %>'/>
+                            <asp:Button ID="btnEdit" runat="server" Text="編輯" CommandName="CommEdit" CommandArgument='<%# Eval("Count") %>'/>
                         </ItemTemplate>
                     </asp:TemplateField>
 

@@ -19,8 +19,8 @@ namespace QuestionnaireSystem.SystemAdminPages
             //Session.Abandon(); // 需用 Session 檢查登入
             Session["ProblemDT"] = null;
             Session["PbGuid"] = null;
-            Session["CommonDT"] = null;
-            Session["CommID"] = null;
+            Session["CommonList"] = null;
+            Session["Count"] = null;
 
             #region 開發時隱藏
             if (!AuthManager.IsLogined())
